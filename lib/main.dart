@@ -69,15 +69,18 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> listItems = List();
 
     for (int i = 0; i < count; i++) {
-      listItems.add(Padding(padding: EdgeInsets.all(20.0),
-          child: Text(
-              'Item ${i.toString()}',
-              style: TextStyle(fontSize: 25.0)
-          )
-      ));
+      listItems.add(Padding(
+          padding: EdgeInsets.all(20.0),
+          child:
+              Text('Item ${i.toString()}', style: TextStyle(fontSize: 25.0))));
     }
 
     return listItems;
+  }
+
+  Stream<List<Widget>> loadData() async* {
+    await Future.delayed(Duration(seconds: 3));
+    yield List.generate(10, (index) => Text("Index $index"));
   }
 
   @override
@@ -94,38 +97,53 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            leading: IconButton(
-                icon: Icon(Icons.autorenew),
-                onPressed: () {
-                  // Do something
-                },
-            ),
-            expandedHeight: 220.0,
-            floating: true,
-            pinned: true,
-            snap: true,
-            elevation: 50,
-            backgroundColor: Colors.blue,
-            flexibleSpace: FlexibleSpaceBar(
-                centerTitle: true,
-                title: Text('My Library ${_counter}',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                    )),
-                background: Image.network(
-                  'https://images.pexels.com/photos/443356/pexels-photo-443356.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-                  fit: BoxFit.cover,
+      body: StreamBuilder<List<Widget>>(
+        stream: loadData(),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      leading: IconButton(
+                        icon: Icon(Icons.autorenew),
+                        onPressed: () {
+                          // Do something
+                        },
+                      ),
+                      expandedHeight: 220.0,
+                      floating: true,
+                      pinned: true,
+                      snap: true,
+                      elevation: 50,
+                      backgroundColor: Colors.blue,
+                      flexibleSpace: FlexibleSpaceBar(
+                          centerTitle: true,
+                          title: Text('My Library ${_counter}',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                              )),
+                          background: Image.network(
+                            'https://images.pexels.com/photos/443356/pexels-photo-443356.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+                            fit: BoxFit.cover,
+                          )),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return ListTile(
+                          title: snapshot.data[index],
+                        );
+                      }, childCount: snapshot.data.length),
+                    ),
+                    SliverList(
+                      delegate: SliverChildListDelegate(_loadLibrary(50)),
+                    ),
+                  ],
                 )
-            ),
-          ),
-          SliverList(
-              delegate: SliverChildListDelegate(_loadLibrary(50)),
-          ),
-        ],
+              : Center(
+                  child: CircularProgressIndicator(),
+                );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addBook,
