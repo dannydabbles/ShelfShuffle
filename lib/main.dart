@@ -69,10 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Widget> listItems = List();
 
     for (int i = 0; i < count; i++) {
-      listItems.add(new Padding(padding: new EdgeInsets.all(20.0),
-          child: new Text(
+      listItems.add(Padding(padding: EdgeInsets.all(20.0),
+          child: Text(
               'Item ${i.toString()}',
-              style: new TextStyle(fontSize: 25.0)
+              style: TextStyle(fontSize: 25.0)
           )
       ));
     }
@@ -122,8 +122,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
             ),
           ),
-          new SliverList(
-              delegate: new SliverChildListDelegate(_loadLibrary(50)),
+          SliverList(
+              delegate: SliverChildListDelegate(_loadLibrary(50)),
           ),
         ],
       ),
