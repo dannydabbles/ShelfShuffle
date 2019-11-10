@@ -83,9 +83,17 @@ class _MyHomePageState extends State<MyHomePage> {
           true, // Show flash
           ScanMode.DEFAULT // Scan a barcode
       );
-      setState(() {
-        ISBNs.add(barcodeScanRes);
+      var bookUrl = url + barcodeScanRes;
+      print(bookUrl);
+      await http.get(bookUrl).then((response) {
+        Map<String, dynamic> data = jsonDecode(response.body.toString());
+        print(data);
+        if (data.isNotEmpty && data['totalItems'] != 0) {
+          items.add(Text(data['items'][0]['volumeInfo']['title'].toString()));
+          ISBNs.add(barcodeScanRes);
+        }
       });
+      setState(() {});
       print(ISBNs);
     } catch (Exception) {
       print(Exception);
@@ -95,21 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Widget> items = [];
 
   Stream<List<Widget>> loadData() async* {
-    items.clear();
-    for (String isbn in ISBNs) {
-      var bookUrl = url + isbn;
-      print(bookUrl);
-      await http.get(bookUrl).then((response) {
-        Map<String, dynamic> data = jsonDecode(response.body.toString());
-        print(data);
-        items.add(Text(data['items'][0]['volumeInfo']['title'].toString()));
-      });
-      yield items;
-      //http.Request('GET'), "https://www.googleapis.com/books/v1/volumes?q=harrypotter");
-    }
-    if (items.isEmpty) {
-      yield [];
-    }
+    yield items;
   }
 
   @override
