@@ -3,9 +3,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
-const url =
-    'https://www.googleapis.com/books/v1/volumes?q=harry+potter+inauthor:rowling';
+const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
 
 void main() => runApp(MyApp());
@@ -49,38 +49,67 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
+
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  Set<String> ISBNs = Set();
 
-  void _addBook() {
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+    });
+    print(ISBNs);
+  }
+
+  void _clearBooks() {
+    ISBNs.clear();
+    items.clear();
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
     });
   }
 
-  List _loadLibrary(int count) {
-    List<Widget> listItems = List();
-
-    for (int i = 0; i < count; i++) {
-      listItems.add(Padding(
-          padding: EdgeInsets.all(20.0),
-          child:
-              Text('Item ${i.toString()}', style: TextStyle(fontSize: 25.0))));
+  void scanBarcode() async {
+    try {
+      String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", // Red barcode line
+          "Cancel", // Cancel button text
+          true, // Show flash
+          ScanMode.DEFAULT // Scan a barcode
+      );
+      setState(() {
+        ISBNs.add(barcodeScanRes);
+      });
+      print(ISBNs);
+    } catch (Exception) {
+      print(Exception);
     }
-
-    return listItems;
   }
 
+  List<Widget> items = [];
+
   Stream<List<Widget>> loadData() async* {
-    await Future.delayed(Duration(seconds: 3));
-    yield List.generate(10, (index) => Text("Index $index"));
+    items.clear();
+    for (String isbn in ISBNs) {
+      var bookUrl = url + isbn;
+      print(bookUrl);
+      await http.get(bookUrl).then((response) {
+        Map<String, dynamic> data = jsonDecode(response.body.toString());
+        print(data);
+        items.add(Text(data['items'][0]['volumeInfo']['title'].toString()));
+      });
+      yield items;
+      //http.Request('GET'), "https://www.googleapis.com/books/v1/volumes?q=harrypotter");
+    }
+    if (items.isEmpty) {
+      yield [];
+    }
   }
 
   @override
@@ -106,19 +135,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     SliverAppBar(
                       leading: IconButton(
                         icon: Icon(Icons.autorenew),
-                        onPressed: () {
-                          // Do something
-                        },
+                        onPressed: _clearBooks,
                       ),
                       expandedHeight: 220.0,
                       floating: true,
                       pinned: true,
                       snap: true,
-                      elevation: 50,
+                      elevation: 5,
                       backgroundColor: Colors.blue,
                       flexibleSpace: FlexibleSpaceBar(
                           centerTitle: true,
-                          title: Text('My Library ${_counter}',
+                          title: Text('My Library',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16.0,
@@ -135,9 +162,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         );
                       }, childCount: snapshot.data.length),
                     ),
-                    SliverList(
-                      delegate: SliverChildListDelegate(_loadLibrary(50)),
-                    ),
                   ],
                 )
               : Center(
@@ -146,7 +170,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addBook,
+        onPressed: scanBarcode,
         tooltip: 'Add a new book',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

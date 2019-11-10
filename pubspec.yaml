@@ -19,6 +19,7 @@ environment:
 dependencies:
   googleapis: any
   googleapis_auth: any
+  flutter_barcode_scanner: ^0.1.7
 
   flutter:
     sdk: flutter
