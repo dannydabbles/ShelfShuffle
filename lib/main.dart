@@ -49,17 +49,16 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
-
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   Set<String> ISBNs = Set();
+  List<Widget> items = [];
 
   @override
   void initState() {
     super.initState();
-    setState(() {
-    });
+    setState(() {});
     print(ISBNs);
   }
 
@@ -76,31 +75,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void scanBarcode() async {
-    try {
-      String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666", // Red barcode line
-          "Cancel", // Cancel button text
-          true, // Show flash
-          ScanMode.DEFAULT // Scan a barcode
-      );
-      var bookUrl = url + barcodeScanRes;
-      print(bookUrl);
-      await http.get(bookUrl).then((response) {
-        Map<String, dynamic> data = jsonDecode(response.body.toString());
-        print(data);
-        if (data.isNotEmpty && data['totalItems'] != 0) {
+    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666", // Red barcode line
+        "Cancel", // Cancel button text
+        true, // Show flash
+        ScanMode.DEFAULT // Scan a barcode
+        );
+    var bookUrl = url + barcodeScanRes;
+    print(bookUrl);
+    await http.get(bookUrl).then((response) {
+      Map<String, dynamic> data = jsonDecode(response.body.toString());
+      print(data);
+      if (data.isNotEmpty && data['totalItems'] != 0) {
+        if (!ISBNs.contains(barcodeScanRes)) {
           items.add(Text(data['items'][0]['volumeInfo']['title'].toString()));
           ISBNs.add(barcodeScanRes);
         }
-      });
-      setState(() {});
-      print(ISBNs);
-    } catch (Exception) {
-      print(Exception);
-    }
+      }
+    });
+    setState(() {});
+    print(ISBNs);
   }
-
-  List<Widget> items = [];
 
   Stream<List<Widget>> loadData() async* {
     yield items;
