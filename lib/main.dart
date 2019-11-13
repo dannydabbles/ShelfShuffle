@@ -5,10 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
+import 'package:shelf_shuffle/shelf.dart';
+
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
 
-void main() => runApp(MyApp());
+void main() => runApp(
+    MyApp()
+);
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -52,26 +56,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Set<String> ISBNs = Set();
-  List<Widget> items = [];
-
   @override
   void initState() {
     super.initState();
+    loadShelf();
     setState(() {});
-    print(ISBNs);
   }
 
   void _clearBooks() {
-    ISBNs.clear();
-    items.clear();
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-    });
+    clearShelf();
+    setState(() {});
   }
 
   void scanBarcode() async {
@@ -84,21 +78,35 @@ class _MyHomePageState extends State<MyHomePage> {
     var bookUrl = url + barcodeScanRes;
     print(bookUrl);
     await http.get(bookUrl).then((response) {
-      Map<String, dynamic> data = jsonDecode(response.body.toString());
+      String json = response.body.toString();
+      Map<String, dynamic> data = jsonDecode(json);
       print(data);
       if (data.isNotEmpty && data['totalItems'] != 0) {
-        if (!ISBNs.contains(barcodeScanRes)) {
-          items.add(Text(data['items'][0]['volumeInfo']['title'].toString()));
-          ISBNs.add(barcodeScanRes);
+        int date = 0;
+        try {
+          date = DateTime
+              .parse(data['items'][0]['volumeInfo']['publishedDate'])
+              .millisecondsSinceEpoch;
+        } catch (Exception) {
+          date = DateTime
+              .parse(data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
+              .millisecondsSinceEpoch;
         }
+        insertBook(Book(
+          title: data['items'][0]['volumeInfo']['title'],
+          date: date,
+          author: data['items'][0]['volumeInfo']['authors'][0],
+          isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier'],
+          description: data['items'][0]['volumeInfo']['description'],
+          google_api_json: json,
+        ));
       }
     });
     setState(() {});
-    print(ISBNs);
   }
 
   Stream<List<Widget>> loadData() async* {
-    yield items;
+    yield await getBookWidgets();
   }
 
   @override
