@@ -156,6 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         return ListTile(
+                          contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                           title: snapshot.data[index],
                         );
                       }, childCount: snapshot.data.length),

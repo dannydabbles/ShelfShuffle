@@ -335,7 +335,7 @@ class Book {
 
   Widget toWidget() {
     return Card(
-      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+      margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
