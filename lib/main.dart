@@ -96,6 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
           title: data['items'][0]['volumeInfo']['title'],
           date: date,
           author: data['items'][0]['volumeInfo']['authors'][0],
+          cover: data['items'][0]['volumeInfo']['imageLinks']["thumbnail"],
           isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier'],
           description: data['items'][0]['volumeInfo']['description'],
           google_api_json: json,

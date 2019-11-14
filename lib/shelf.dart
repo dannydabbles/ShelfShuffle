@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart';
 
 final database = initShelf();
 
@@ -139,7 +141,8 @@ var example = Book(
   isbn: '0747595836',
   description:
       "Harry Potter is preparing to leave the Dursleys and Privet Drive for the last time. But the future that awaits him is full of danger, not only for him, but for anyone close to him - and Harry has already lost so much. Only by destroying Voldemort's remaining Horcruxes can Harry free himself and overcome the Dark Lord's forces of evil. In this dramatic conclusion to the Harry Potter series, Harry must leave his most loyal friends behind, and in a final perilous journey find the strength and the will to face his terrifying destiny: a deadly confrontation that is his alone to fight. In this thrilling climax to the phenomenally bestselling series, J.K. Rowling reveals all to her eagerly waiting readers.",
-  cover: "http://books.google.com/books/content?id=UGAKB3r0sZQC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
+  cover:
+      "http://books.google.com/books/content?id=uaxPJwAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api",
   google_api_json: """
 {
  "kind": "books#volumes",
@@ -279,7 +282,97 @@ class Book {
     return 'Book{id: $id, title: $title, date: ${DateTime.fromMillisecondsSinceEpoch(date)}, author: $author, isbn: $isbn, description: $description}';
   }
 
+  Widget toDetailWidget() {
+    return Card(
+      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Container(
+          child: Row(
+            children: <Widget>[
+              Image(
+                image: NetworkImage("$cover"),
+                alignment: Alignment.centerLeft,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(children: <Widget>[
+                    Text(
+                      "$title",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.3,
+                    ),
+                    Text(
+                      "by \n$author",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.15,
+                    ),
+                    Text(
+                      "Published ${DateFormat('yyyy').format(DateTime.fromMillisecondsSinceEpoch(date).toLocal())}",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: .8,
+                    ),
+                    Text(
+                      "$description",
+                      softWrap: true,
+                      textAlign: TextAlign.left,
+                      maxLines: 7,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget toWidget() {
-    return Text(this.toString());
+    return Card(
+      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Flexible(
+              child: FractionallySizedBox(
+                widthFactor: .2,
+                child: Material(
+                  elevation: 3,
+                  child: Image(
+                    image: NetworkImage("$cover"),
+                    alignment: Alignment.center,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: 1.7,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(children: <Widget>[
+                    Text(
+                      "$title",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.3,
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
