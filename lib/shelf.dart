@@ -81,7 +81,7 @@ Future<List<Widget>> getBookWidgets() async {
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
   return List.generate(maps.length, (i) {
-    return Book(
+    Book book = Book(
       id: maps[i]['id'],
       title: maps[i]['title'],
       date: maps[i]['date'],
@@ -90,7 +90,8 @@ Future<List<Widget>> getBookWidgets() async {
       description: maps[i]['description'],
       cover: maps[i]['cover'],
       google_api_json: maps[i]['google_api_json'],
-    ).toWidget();
+    );
+    return book.toWidget();
   });
 }
 
