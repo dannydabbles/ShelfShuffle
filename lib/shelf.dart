@@ -22,6 +22,7 @@ Future<Database> initShelf() async {
         "author TEXT, "
         "isbn TEXT, "
         "description TEXT, "
+        "cover TEXT, "
         "google_api_json TEXT"
         ")",
       );
@@ -63,6 +64,7 @@ Future<List<Book>> getBooks() async {
       author: maps[i]['author'],
       isbn: maps[i]['isbn'],
       description: maps[i]['description'],
+      cover: maps[i]['cover'],
       google_api_json: maps[i]['google_api_json'],
     );
   });
@@ -84,6 +86,7 @@ Future<List<Widget>> getBookWidgets() async {
       author: maps[i]['author'],
       isbn: maps[i]['isbn'],
       description: maps[i]['description'],
+      cover: maps[i]['cover'],
       google_api_json: maps[i]['google_api_json'],
     ).toWidget();
   });
@@ -136,6 +139,7 @@ var example = Book(
   isbn: '0747595836',
   description:
       "Harry Potter is preparing to leave the Dursleys and Privet Drive for the last time. But the future that awaits him is full of danger, not only for him, but for anyone close to him - and Harry has already lost so much. Only by destroying Voldemort's remaining Horcruxes can Harry free himself and overcome the Dark Lord's forces of evil. In this dramatic conclusion to the Harry Potter series, Harry must leave his most loyal friends behind, and in a final perilous journey find the strength and the will to face his terrifying destiny: a deadly confrontation that is his alone to fight. In this thrilling climax to the phenomenally bestselling series, J.K. Rowling reveals all to her eagerly waiting readers.",
+  cover: "http://books.google.com/books/content?id=UGAKB3r0sZQC&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
   google_api_json: """
 {
  "kind": "books#volumes",
@@ -226,6 +230,7 @@ void loadShelf() async {
     author: example.author,
     isbn: example.isbn,
     description: example.description,
+    cover: example.cover,
     google_api_json: example.google_api_json,
   );
 
@@ -240,6 +245,7 @@ class Book {
   final String author;
   final String isbn;
   final String description;
+  final String cover;
   final String google_api_json;
 
   Book({
@@ -249,6 +255,7 @@ class Book {
     this.author,
     this.isbn,
     this.description,
+    this.cover,
     this.google_api_json,
   });
 
@@ -260,6 +267,7 @@ class Book {
       'author': author,
       'isbn': isbn,
       'description': description,
+      'cover': cover,
       'google_api_json': google_api_json,
     };
   }
