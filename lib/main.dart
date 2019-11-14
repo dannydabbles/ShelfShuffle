@@ -10,9 +10,7 @@ import 'package:shelf_shuffle/shelf.dart';
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
 
-void main() => runApp(
-    MyApp()
-);
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -84,12 +82,11 @@ class _MyHomePageState extends State<MyHomePage> {
       if (data.isNotEmpty && data['totalItems'] != 0) {
         int date = 0;
         try {
-          date = DateTime
-              .parse(data['items'][0]['volumeInfo']['publishedDate'])
+          date = DateTime.parse(data['items'][0]['volumeInfo']['publishedDate'])
               .millisecondsSinceEpoch;
         } catch (Exception) {
-          date = DateTime
-              .parse(data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
+          date = DateTime.parse(
+                  data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
               .millisecondsSinceEpoch;
         }
         insertBook(Book(
@@ -97,7 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
           date: date,
           author: data['items'][0]['volumeInfo']['authors'][0],
           cover: data['items'][0]['volumeInfo']['imageLinks']["thumbnail"],
-          isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]['identifier'],
+          isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]
+              ['identifier'],
           description: data['items'][0]['volumeInfo']['description'],
           google_api_json: json,
         ));

@@ -335,9 +335,9 @@ class Book {
 
   Widget toWidget() {
     return Card(
-      margin: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
+      margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
@@ -358,7 +358,7 @@ class Book {
                 alignment: Alignment.centerLeft,
                 widthFactor: 1.7,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                   child: Column(children: <Widget>[
                     Text(
                       "$title",
