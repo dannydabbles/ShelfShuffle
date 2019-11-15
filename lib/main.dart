@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:shelf_shuffle/shelf.dart';
+import 'package:shelf_shuffle/expanding_fab.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -166,10 +167,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: ExpandingFab(
         onPressed: scanBarcode,
         tooltip: 'Add a new book',
-        child: Icon(Icons.add),
+        icon: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
