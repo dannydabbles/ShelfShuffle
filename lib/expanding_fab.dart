@@ -35,7 +35,7 @@ class _ExpandingFabState extends State<ExpandingFab>
     _animateIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _buttonColor = ColorTween(
-      begin: Colors.blue,
+      begin: Colors.green,
       end: Colors.red,
     ).animate(CurvedAnimation(
       parent: _animationController,
@@ -107,7 +107,7 @@ class _ExpandingFabState extends State<ExpandingFab>
   Widget toggle() {
     return Container(
       child: FloatingActionButton(
-        backgroundColor: _buttonColor.value,
+        backgroundColor: Colors.green,
         onPressed: animate,
         tooltip: 'Toggle',
         child: AnimatedIcon(
