@@ -90,10 +90,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
               .millisecondsSinceEpoch;
         }
+        List<String> authors = data['items'][0]['volumeInfo']['authors'];
+        if (authors.length > 1) {
+          authors[-1] = "and " + authors[-1];
+        }
         insertBook(Book(
           title: data['items'][0]['volumeInfo']['title'],
           date: date,
-          author: data['items'][0]['volumeInfo']['authors'][0],
+          author: authors.join(", "),
           cover: data['items'][0]['volumeInfo']['imageLinks']["thumbnail"],
           isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]
               ['identifier'],
