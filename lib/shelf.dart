@@ -77,7 +77,8 @@ Future<List<String>> getAuthors() async {
   final Database db = await database;
 
   // Query the table for all The Books.
-  final List<Map<String, dynamic>> maps = await db.rawQuery("SELECT DISTINCT author FROM books");
+  final List<Map<String, dynamic>> maps =
+      await db.rawQuery("SELECT DISTINCT author FROM books");
   print(maps);
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
@@ -259,9 +260,9 @@ void loadShelf() async {
 
 Widget authorWidget(String author) {
   return Card(
-    margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
+    margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -380,47 +381,113 @@ class Book {
     );
   }
 
-  Widget toWidget() {
-    return Card(
-      color: Colors.white,
-      margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+  Widget slideLeftBackground() {
+    return Container(
+      color: Colors.red,
+      child: Align(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Flexible(
-              child: FractionallySizedBox(
-                widthFactor: .2,
-                child: Material(
-                  elevation: 3,
-                  child: Image(
-                    image: NetworkImage("$cover"),
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
+            Icon(
+              Icons.delete,
+              color: Colors.white,
             ),
-            Flexible(
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: 1.7,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                  child: Column(children: <Widget>[
-                    Text(
-                      "$title",
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      textScaleFactor: 1.3,
-                    ),
-                  ]),
-                ),
+            Text(
+              " Delete",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
               ),
+              textAlign: TextAlign.right,
+            ),
+            SizedBox(
+              width: 20,
             ),
           ],
         ),
+        alignment: Alignment.centerRight,
       ),
     );
+  }
+
+  Widget slideRightBackground() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      child: Container(
+        color: Colors.green,
+        child: Align(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              SizedBox(
+                width: 20,
+              ),
+              Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              Text(
+                " Edit",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.left,
+              ),
+            ],
+          ),
+          alignment: Alignment.centerLeft,
+        ),
+      ),
+    );
+  }
+
+  Widget toWidget() {
+    return Dismissible(
+        key: Key(this.id.toString()),
+        background: slideLeftBackground(),
+        secondaryBackground: slideRightBackground(),
+        onDismissed: (direction) => {print("Direction: $direction")},
+        child: Card(
+          color: Colors.white,
+          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Flexible(
+                  child: FractionallySizedBox(
+                    widthFactor: .2,
+                    child: Material(
+                      elevation: 3,
+                      child: Image(
+                        image: NetworkImage("$cover"),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: FractionallySizedBox(
+                    alignment: Alignment.centerLeft,
+                    widthFactor: 1.7,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                      child: Column(children: <Widget>[
+                        Text(
+                          "$title",
+                          softWrap: true,
+                          textAlign: TextAlign.center,
+                          textScaleFactor: 1.3,
+                        ),
+                      ]),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ));
   }
 }
