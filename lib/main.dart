@@ -7,6 +7,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:shelf_shuffle/shelf.dart';
 import 'package:shelf_shuffle/expanding_fab.dart';
+import 'package:expandable/expandable.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -112,7 +113,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Stream<List<Widget>> loadData() async* {
     List<Widget> slivers = [];
     for (String author in await getAuthors()) {
-      slivers += [authorWidget(author)] + await getBookWidgets(author);
+      slivers += [
+        ExpandablePanel(
+            hasIcon: false,
+            tapHeaderToExpand: true,
+            header: authorWidget(author),
+            collapsed: Column(children: await getBookWidgets(author)))
+      ];
     }
     yield slivers;
   }
@@ -155,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     fontWeight: FontWeight.bold,
                                     shadows: <Shadow>[
                                       Shadow(
-                                        offset: Offset(1.0,-0.5),
+                                        offset: Offset(1.0, -0.5),
                                         blurRadius: 3.0,
                                         color: Color.fromARGB(255, 0, 0, 0),
                                       ),
