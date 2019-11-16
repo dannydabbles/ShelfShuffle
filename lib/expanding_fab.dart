@@ -107,7 +107,7 @@ class _ExpandingFabState extends State<ExpandingFab>
   Widget toggle() {
     return Container(
       child: FloatingActionButton(
-        backgroundColor: Colors.green,
+        backgroundColor: _buttonColor.value,
         onPressed: animate,
         tooltip: 'Toggle',
         child: AnimatedIcon(

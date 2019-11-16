@@ -72,12 +72,27 @@ Future<List<Book>> getBooks() async {
   });
 }
 
-Future<List<Widget>> getBookWidgets() async {
+Future<List<String>> getAuthors() async {
   // Get a reference to the database.
   final Database db = await database;
 
   // Query the table for all The Books.
-  final List<Map<String, dynamic>> maps = await db.query('books');
+  final List<Map<String, dynamic>> maps = await db.rawQuery("SELECT DISTINCT author FROM books");
+  print(maps);
+
+  // Convert the List<Map<String, dynamic> into a List<Book>.
+  return List.generate(maps.length, (i) {
+    return maps[i]['author'];
+  });
+}
+
+Future<List<Widget>> getBookWidgets(String author) async {
+  // Get a reference to the database.
+  final Database db = await database;
+
+  // Query the table for all The Books.
+  final List<Map<String, dynamic>> maps =
+      await db.query('books', where: "author = ?", whereArgs: [author]);
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
   return List.generate(maps.length, (i) {
@@ -242,6 +257,37 @@ void loadShelf() async {
   await insertBook(example);
 }
 
+Widget authorWidget(String author) {
+  return Card(
+    margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Flexible(
+            child: FractionallySizedBox(
+              alignment: Alignment.centerLeft,
+              widthFactor: 1,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                child: Column(children: <Widget>[
+                  Text(
+                    "$author",
+                    softWrap: true,
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1.3,
+                  ),
+                ]),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class Book {
   final int id;
   final String title;
@@ -336,6 +382,7 @@ class Book {
 
   Widget toWidget() {
     return Card(
+      color: Colors.white,
       margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8.0, 4.0, 8.0, 4.0),

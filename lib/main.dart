@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
               .millisecondsSinceEpoch;
         }
-        List<String> authors = data['items'][0]['volumeInfo']['authors'];
+        List<dynamic> authors = data['items'][0]['volumeInfo']['authors'];
         if (authors.length > 1) {
           authors[-1] = "and " + authors[-1];
         }
@@ -110,7 +110,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Stream<List<Widget>> loadData() async* {
-    yield await getBookWidgets();
+    List<Widget> slivers = [];
+    for (String author in await getAuthors()) {
+      slivers += [authorWidget(author)] + await getBookWidgets(author);
+    }
+    yield slivers;
   }
 
   @override
@@ -146,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Text(widget.title,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    color: Colors.green,
+                                    color: Colors.white,
                                     fontSize: 30.0,
                                     fontWeight: FontWeight.bold,
                                     shadows: <Shadow>[
