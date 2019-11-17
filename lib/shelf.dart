@@ -36,6 +36,67 @@ Future<Database> initShelf() async {
   return database;
 }
 
+Widget slideLeftBackground() {
+  return Container(
+    color: Colors.red,
+    child: Align(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Icon(
+            Icons.delete,
+            color: Colors.white,
+          ),
+          Text(
+            " Delete",
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.right,
+          ),
+          SizedBox(
+            width: 20,
+          ),
+        ],
+      ),
+      alignment: Alignment.centerRight,
+    ),
+  );
+}
+
+Widget slideRightBackground() {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+    child: Container(
+      color: Colors.green,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            SizedBox(
+              width: 20,
+            ),
+            Icon(
+              Icons.edit,
+              color: Colors.white,
+            ),
+            Text(
+              " Edit",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerLeft,
+      ),
+    ),
+  );
+}
+
 Future<void> insertBook(Book book) async {
   // Get a reference to the database.
   final Database db = await database;
@@ -259,35 +320,43 @@ void loadShelf() async {
 }
 
 Widget authorWidget(String author) {
-  return Card(
-    margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
-    child: Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            child: FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: 1,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                child: Column(children: <Widget>[
-                  Text(
-                    "$author",
-                    softWrap: true,
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 1,
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, height: 2),
+  return Dismissible(
+      key: Key(author),
+      background: slideLeftBackground(),
+      secondaryBackground: slideRightBackground(),
+      onDismissed: (direction) => {print("Direction: $direction")},
+      child: Card(
+        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Flexible(
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                    child: Column(children: <Widget>[
+                      Text(
+                        "$author",
+                        softWrap: true,
+                        textAlign: TextAlign.center,
+                        textScaleFactor: 1,
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            height: 2),
+                      ),
+                    ]),
                   ),
-                ]),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    ),
-  );
+        ),
+      ));
 }
 
 class Book {
@@ -377,67 +446,6 @@ class Book {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget slideLeftBackground() {
-    return Container(
-      color: Colors.red,
-      child: Align(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              Icons.delete,
-              color: Colors.white,
-            ),
-            Text(
-              " Delete",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.right,
-            ),
-            SizedBox(
-              width: 20,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerRight,
-      ),
-    );
-  }
-
-  Widget slideRightBackground() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-      child: Container(
-        color: Colors.green,
-        child: Align(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              SizedBox(
-                width: 20,
-              ),
-              Icon(
-                Icons.edit,
-                color: Colors.white,
-              ),
-              Text(
-                " Edit",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ],
-          ),
-          alignment: Alignment.centerLeft,
         ),
       ),
     );
