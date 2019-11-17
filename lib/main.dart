@@ -238,6 +238,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           background: Image.network(
                             'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&h=650&w=940',
                             fit: BoxFit.cover,
+                            color: Colors.grey,
+                            colorBlendMode: BlendMode.saturation,
                           )),
                     ),
                     SliverList(
