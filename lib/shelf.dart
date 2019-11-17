@@ -328,7 +328,7 @@ Widget authorWidget(String author) {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Flexible(
                 child: Padding(
