@@ -32,7 +32,10 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.grey,
       ),
-      home: MyHomePage(title: title),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => MyHomePage(title: title)
+      },
     );
   }
 }
