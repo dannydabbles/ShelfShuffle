@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.grey,
       ),
       home: MyHomePage(title: title),
     );
@@ -133,6 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      backgroundColor: Colors.black12,
       body: StreamBuilder<List<Widget>>(
         stream: loadData(),
         builder: (context, snapshot) {
@@ -143,28 +144,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       leading: IconButton(
                         icon: Icon(Icons.autorenew),
                         onPressed: _clearBooks,
+                        color: Colors.white,
                       ),
                       expandedHeight: 220.0,
                       floating: true,
                       pinned: true,
                       snap: true,
                       elevation: 5,
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.grey,
                       flexibleSpace: FlexibleSpaceBar(
                           centerTitle: true,
                           title: Text(widget.title,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 30.0,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        offset: Offset(1.0, -0.5),
-                                        blurRadius: 3.0,
-                                        color: Color.fromARGB(255, 0, 0, 0),
-                                      ),
-                                    ])),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 30.0,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      offset: Offset(1.0, -0.5),
+                                      blurRadius: 3.0,
+                                      color: Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                  ])),
                           background: Image.network(
                             'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&h=650&w=940',
                             fit: BoxFit.cover,

@@ -7,8 +7,8 @@ class ExpandingFab extends StatefulWidget {
   final String tooltip;
   final Icon icon;
 
-  ExpandingFab({this.onPressed, this.tooltip, this.icon}){
-    func=this.onPressed;
+  ExpandingFab({this.onPressed, this.tooltip, this.icon}) {
+    func = this.onPressed;
   }
 
   @override
@@ -28,14 +28,14 @@ class _ExpandingFabState extends State<ExpandingFab>
   @override
   initState() {
     _animationController =
-    AnimationController(vsync: this, duration: Duration(milliseconds: 500))
-      ..addListener(() {
-        setState(() {});
-      });
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500))
+          ..addListener(() {
+            setState(() {});
+          });
     _animateIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _buttonColor = ColorTween(
-      begin: Colors.green,
+      begin: Colors.grey,
       end: Colors.red,
     ).animate(CurvedAnimation(
       parent: _animationController,

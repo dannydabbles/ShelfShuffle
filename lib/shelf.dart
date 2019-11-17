@@ -37,7 +37,7 @@ Future<Database> initShelf() async {
 }
 
 Widget slideLeftBackground() {
-  return Container(
+  return Card(
     color: Colors.red,
     child: Align(
       child: Row(
@@ -66,33 +66,30 @@ Widget slideLeftBackground() {
 }
 
 Widget slideRightBackground() {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-    child: Container(
-      color: Colors.green,
-      child: Align(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            SizedBox(
-              width: 20,
-            ),
-            Icon(
-              Icons.edit,
+  return Card(
+    color: Colors.green,
+    child: Align(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          SizedBox(
+            width: 20,
+          ),
+          Icon(
+            Icons.edit,
+            color: Colors.white,
+          ),
+          Text(
+            " Edit",
+            style: TextStyle(
               color: Colors.white,
+              fontWeight: FontWeight.w700,
             ),
-            Text(
-              " Edit",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ],
-        ),
-        alignment: Alignment.centerLeft,
+            textAlign: TextAlign.left,
+          ),
+        ],
       ),
+      alignment: Alignment.centerLeft,
     ),
   );
 }
@@ -326,31 +323,30 @@ Widget authorWidget(String author) {
       secondaryBackground: slideRightBackground(),
       onDismissed: (direction) => {print("Direction: $direction")},
       child: Card(
-        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+        color: Colors.white38,
+        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Flexible(
-                child: FractionallySizedBox(
-                  alignment: Alignment.centerLeft,
-                  widthFactor: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                    child: Column(children: <Widget>[
-                      Text(
-                        "$author",
-                        softWrap: true,
-                        textAlign: TextAlign.center,
-                        textScaleFactor: 1,
-                        style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            height: 2),
-                      ),
-                    ]),
-                  ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                  child: Column(children: <Widget>[
+                    Text(
+                      "$author",
+                      softWrap: true,
+                      textScaleFactor: 1,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          height: 1),
+                    ),
+                  ]),
                 ),
               ),
             ],
@@ -457,44 +453,48 @@ class Book {
         background: slideLeftBackground(),
         secondaryBackground: slideRightBackground(),
         onDismissed: (direction) => {print("Direction: $direction")},
-        child: Card(
-          color: Colors.white,
-          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Flexible(
-                  child: FractionallySizedBox(
-                    widthFactor: .2,
-                    child: Material(
-                      elevation: 3,
+        child: Container(
+          height: 50,
+          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
+          child: Card(
+            color: Colors.white24,
+            margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 2.0),
+              child: Row(
+                children: <Widget>[
+                  Flexible(
+                    child: FractionallySizedBox(
+                      widthFactor: .2,
                       child: Image(
                         image: NetworkImage("$cover"),
                         alignment: Alignment.center,
                       ),
                     ),
                   ),
-                ),
-                Flexible(
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: 1.7,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                      child: Column(children: <Widget>[
-                        Text(
+                  Flexible(
+                    child: FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: 1.8,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                        child: Text(
                           "$title",
                           softWrap: true,
-                          textAlign: TextAlign.center,
-                          textScaleFactor: 1.3,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                            height: 1,
+                          ),
                         ),
-                      ]),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ));
