@@ -58,7 +58,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool scanning;
 
-  _MyHomePageState({this.scanning}){
+  _MyHomePageState({this.scanning}) {
     this.scanning = false;
   }
 
@@ -74,16 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
-  void scanBarcode() async {
-    if (this.scanning != null && this.scanning) return;
-    this.scanning = true;
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", // Red barcode line
-        "Cancel", // Cancel button text
-        true, // Show flash
-        ScanMode.DEFAULT // Scan a barcode
-        );
-    var bookUrl = url + barcodeScanRes;
+  void fetchISBN(String isbn) async {
+    var bookUrl = url + isbn;
     print(bookUrl);
     await http.get(bookUrl).then((response) {
       String json = response.body.toString();
@@ -116,7 +108,70 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     setState(() {});
+  }
+
+  void scanBarcode() async {
+    if (this.scanning != null && this.scanning) return;
+    this.scanning = true;
+    String isbn = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666", // Red barcode line
+        "Cancel", // Cancel button text
+        true, // Show flash
+        ScanMode.DEFAULT // Scan a barcode
+        );
+    fetchISBN(isbn);
     this.scanning = false;
+  }
+
+  void getISBN() async {
+    final String isbn = await _asyncInputDialog(context);
+    fetchISBN(isbn);
+  }
+
+  Future<String> _asyncInputDialog(BuildContext context) async {
+    String teamName = '';
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter a book by ISBN:'),
+          content: new Row(
+            children: <Widget>[
+              new Expanded(
+                  child: new TextField(
+                autofocus: true,
+                decoration: new InputDecoration(
+                    labelText: 'ISBN', hintText: 'eg. 0547951981'),
+                onChanged: (value) {
+                  teamName = value;
+                },
+              ))
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                // Handle special case for empty isbn
+                if (teamName.length > 0) {
+                  Navigator.of(context).pop(teamName);
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Stream<List<Widget>> loadData() async* {
@@ -195,6 +250,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: ExpandingFab(
         barcodeScanner: scanBarcode,
+        lookUpISBN: getISBN,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
