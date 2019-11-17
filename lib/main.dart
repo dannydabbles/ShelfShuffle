@@ -8,6 +8,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:shelf_shuffle/shelf.dart';
 import 'package:shelf_shuffle/expanding_fab.dart';
 import 'package:expandable/expandable.dart';
+import 'package:shelf_shuffle/view_book.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => MyHomePage(title: title)
+        '/': (context) => MyHomePage(title: title),
+        '/book': (context) => EditBookView(),
       },
     );
   }
@@ -177,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Stream<List<Widget>> loadData() async* {
+  Stream<List<Widget>> loadData(BuildContext context) async* {
     List<Widget> slivers = [];
     for (String author in await getAuthors()) {
       slivers += [
@@ -185,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
             hasIcon: false,
             tapHeaderToExpand: true,
             header: authorWidget(author),
-            collapsed: Column(children: await getBookWidgets(author)))
+            collapsed: Column(children: await getBookWidgets(context, author)))
       ];
     }
     yield slivers;
@@ -206,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       backgroundColor: Colors.black12,
       body: StreamBuilder<List<Widget>>(
-        stream: loadData(),
+        stream: loadData(context),
         builder: (context, snapshot) {
           return snapshot.hasData
               ? CustomScrollView(

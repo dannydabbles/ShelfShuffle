@@ -79,6 +79,7 @@ class _ExpandingFabState extends State<ExpandingFab>
   Widget addBarcode() {
     return Container(
       child: FloatingActionButton(
+        heroTag: 2,
         onPressed: this.barcodeScanner,
         tooltip: 'Scan barcode',
         child: RotationTransition(
@@ -91,6 +92,7 @@ class _ExpandingFabState extends State<ExpandingFab>
   Widget addISBN() {
     return Container(
       child: FloatingActionButton(
+        heroTag: 1,
         onPressed: this.lookUpISBN,
         tooltip: 'Enter ISBN',
         child: Icon(Icons.library_add),
@@ -101,6 +103,7 @@ class _ExpandingFabState extends State<ExpandingFab>
   Widget toggle() {
     return Container(
       child: FloatingActionButton(
+        heroTag: 0,
         backgroundColor: _buttonColor.value,
         onPressed: animate,
         tooltip: 'Add a book',

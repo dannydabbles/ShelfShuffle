@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:shelf_shuffle/view_book.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 
@@ -37,7 +38,7 @@ Future<Database> initShelf() async {
   return database;
 }
 
-Widget slideLeftBackground() {
+Widget slideToDeleteBackground() {
   return Card(
     color: Colors.red,
     child: Align(
@@ -66,7 +67,7 @@ Widget slideLeftBackground() {
   );
 }
 
-Widget slideRightBackground() {
+Widget slideToEditBackground() {
   return Card(
     color: Colors.green,
     child: Align(
@@ -147,7 +148,7 @@ Future<List<String>> getAuthors() async {
   });
 }
 
-Future<List<Widget>> getBookWidgets(String author) async {
+Future<List<Widget>> getBookWidgets(BuildContext context, String author) async {
   // Get a reference to the database.
   final Database db = await database;
 
@@ -171,7 +172,7 @@ Future<List<Widget>> getBookWidgets(String author) async {
       cover: maps[i]['cover'],
       google_api_json: maps[i]['google_api_json'],
     );
-    return book.toWidget();
+    return book.toWidget(context);
   });
 }
 
@@ -326,9 +327,9 @@ void loadShelf() async {
 
 Widget authorWidget(String author) {
   return Dismissible(
-      key: Key(author),
-      background: slideLeftBackground(),
-      secondaryBackground: slideRightBackground(),
+      key: UniqueKey(),
+      background: slideToDeleteBackground(),
+      secondaryBackground: slideToEditBackground(),
       onDismissed: (direction) => {print("Author: $author | Direction: $direction")},
       child: Card(
         color: Colors.white38,
@@ -458,12 +459,15 @@ class Book {
     );
   }
 
-  Widget toWidget() {
+  Widget toWidget(BuildContext context) {
     return Dismissible(
-        key: Key(this.id.toString()),
-        background: slideLeftBackground(),
-        secondaryBackground: slideRightBackground(),
-        onDismissed: (direction) => {print("Direction: $direction")},
+        key: UniqueKey(),
+        background: slideToDeleteBackground(),
+        secondaryBackground: slideToEditBackground(),
+        onDismissed: (direction) {
+          print("Direction: $direction");
+          Navigator.pushNamed(context, '/book');
+        },
         child: Container(
           height: 50,
           margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
