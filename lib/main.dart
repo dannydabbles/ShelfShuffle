@@ -56,6 +56,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool scanning;
+
+  _MyHomePageState({this.scanning}){
+    this.scanning = false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void scanBarcode() async {
+    if (this.scanning != null && this.scanning) return;
+    this.scanning = true;
     String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", // Red barcode line
         "Cancel", // Cancel button text
@@ -108,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
     setState(() {});
+    this.scanning = false;
   }
 
   Stream<List<Widget>> loadData() async* {
@@ -185,9 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       floatingActionButton: ExpandingFab(
-        onPressed: scanBarcode,
-        tooltip: 'Add a new book',
-        icon: Icon(Icons.add),
+        barcodeScanner: scanBarcode,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

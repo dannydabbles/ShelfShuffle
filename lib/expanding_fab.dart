@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
-var func = null;
-
 class ExpandingFab extends StatefulWidget {
-  final Function() onPressed;
-  final String tooltip;
-  final Icon icon;
+  final Function() barcodeScanner;
+  final Function() lookUpISBN;
 
-  ExpandingFab({this.onPressed, this.tooltip, this.icon}) {
-    func = this.onPressed;
-  }
+  ExpandingFab({this.barcodeScanner, this.lookUpISBN});
 
   @override
-  _ExpandingFabState createState() => _ExpandingFabState();
+  _ExpandingFabState createState() => _ExpandingFabState(
+        barcodeScanner: this.barcodeScanner,
+        lookUpISBN: this.lookUpISBN,
+      );
 }
 
 class _ExpandingFabState extends State<ExpandingFab>
@@ -24,6 +22,10 @@ class _ExpandingFabState extends State<ExpandingFab>
   Animation<double> _translateButton;
   Curve _curve = Curves.easeOut;
   double _fabHeight = 56.0;
+  final Function() barcodeScanner;
+  final Function() lookUpISBN;
+
+  _ExpandingFabState({this.barcodeScanner, this.lookUpISBN});
 
   @override
   initState() {
@@ -74,32 +76,24 @@ class _ExpandingFabState extends State<ExpandingFab>
     isOpened = !isOpened;
   }
 
-  Widget add() {
+  Widget addBarcode() {
     return Container(
       child: FloatingActionButton(
-        onPressed: func,
-        tooltip: 'Add',
-        child: Icon(Icons.add),
+        onPressed: this.barcodeScanner,
+        tooltip: 'Scan barcode',
+        child: RotationTransition(
+            turns: AlwaysStoppedAnimation(90 / 360),
+            child: Icon(Icons.line_weight)),
       ),
     );
   }
 
-  Widget image() {
+  Widget addISBN() {
     return Container(
       child: FloatingActionButton(
-        onPressed: null,
-        tooltip: 'Image',
-        child: Icon(Icons.image),
-      ),
-    );
-  }
-
-  Widget inbox() {
-    return Container(
-      child: FloatingActionButton(
-        onPressed: null,
-        tooltip: 'Inbox',
-        child: Icon(Icons.inbox),
+        onPressed: this.lookUpISBN,
+        tooltip: 'Enter ISBN',
+        child: Icon(Icons.library_add),
       ),
     );
   }
@@ -109,7 +103,7 @@ class _ExpandingFabState extends State<ExpandingFab>
       child: FloatingActionButton(
         backgroundColor: _buttonColor.value,
         onPressed: animate,
-        tooltip: 'Toggle',
+        tooltip: 'Add a book',
         child: AnimatedIcon(
           icon: AnimatedIcons.menu_close,
           progress: _animateIcon,
@@ -126,18 +120,10 @@ class _ExpandingFabState extends State<ExpandingFab>
         Transform(
           transform: Matrix4.translationValues(
             0.0,
-            _translateButton.value * 3.0,
-            0.0,
-          ),
-          child: add(),
-        ),
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
             _translateButton.value * 2.0,
             0.0,
           ),
-          child: image(),
+          child: addBarcode(),
         ),
         Transform(
           transform: Matrix4.translationValues(
@@ -145,7 +131,7 @@ class _ExpandingFabState extends State<ExpandingFab>
             _translateButton.value,
             0.0,
           ),
-          child: inbox(),
+          child: addISBN(),
         ),
         toggle(),
       ],
