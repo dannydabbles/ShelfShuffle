@@ -149,12 +149,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       pinned: true,
                       snap: true,
                       elevation: 5,
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.green,
                       flexibleSpace: FlexibleSpaceBar(
                           centerTitle: true,
-                          title: FractionallySizedBox(
-                            heightFactor: .265,
-                            child: Text(widget.title,
+                          title: Text(widget.title,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: Colors.white,
@@ -167,7 +165,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                         color: Color.fromARGB(255, 0, 0, 0),
                                       ),
                                     ])),
-                          ),
                           background: Image.network(
                             'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&h=650&w=940',
                             fit: BoxFit.cover,
