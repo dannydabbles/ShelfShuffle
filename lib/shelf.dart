@@ -22,6 +22,7 @@ Future<Database> initShelf() async {
         "title TEXT, "
         "date INTEGER, "
         "author TEXT, "
+        "series TEXT, "
         "isbn TEXT, "
         "description TEXT, "
         "cover TEXT, "
@@ -122,6 +123,7 @@ Future<List<Book>> getBooks() async {
       title: maps[i]['title'],
       date: maps[i]['date'],
       author: maps[i]['author'],
+      series: maps[i]['series'],
       isbn: maps[i]['isbn'],
       description: maps[i]['description'],
       cover: maps[i]['cover'],
@@ -150,8 +152,11 @@ Future<List<Widget>> getBookWidgets(String author) async {
   final Database db = await database;
 
   // Query the table for all The Books.
-  final List<Map<String, dynamic>> maps =
-      await db.query('books', where: "author = ?", whereArgs: [author]);
+  final List<Map<String, dynamic>> maps = await db.query('books',
+      where: "author = ?",
+      whereArgs: [author],
+      groupBy: "series",
+      orderBy: "date");
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
   return List.generate(maps.length, (i) {
@@ -160,6 +165,7 @@ Future<List<Widget>> getBookWidgets(String author) async {
       title: maps[i]['title'],
       date: maps[i]['date'],
       author: maps[i]['author'],
+      series: maps[i]['series'],
       isbn: maps[i]['isbn'],
       description: maps[i]['description'],
       cover: maps[i]['cover'],
@@ -213,6 +219,7 @@ var example = Book(
   title: 'Harry Potter and the Deathly Hallows',
   date: 1199174400000,
   author: 'J. K. Rowling',
+  series: "Harry Potter",
   isbn: '0747595836',
   description:
       "Harry Potter is preparing to leave the Dursleys and Privet Drive for the last time. But the future that awaits him is full of danger, not only for him, but for anyone close to him - and Harry has already lost so much. Only by destroying Voldemort's remaining Horcruxes can Harry free himself and overcome the Dark Lord's forces of evil. In this dramatic conclusion to the Harry Potter series, Harry must leave his most loyal friends behind, and in a final perilous journey find the strength and the will to face his terrifying destiny: a deadly confrontation that is his alone to fight. In this thrilling climax to the phenomenally bestselling series, J.K. Rowling reveals all to her eagerly waiting readers.",
@@ -306,6 +313,7 @@ void loadShelf() async {
     title: example.title,
     date: example.date,
     author: example.author,
+    series: example.series,
     isbn: example.isbn,
     description: example.description,
     cover: example.cover,
@@ -321,7 +329,7 @@ Widget authorWidget(String author) {
       key: Key(author),
       background: slideLeftBackground(),
       secondaryBackground: slideRightBackground(),
-      onDismissed: (direction) => {print("Direction: $direction")},
+      onDismissed: (direction) => {print("Author: $author | Direction: $direction")},
       child: Card(
         color: Colors.white38,
         margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),
@@ -360,6 +368,7 @@ class Book {
   final String title;
   final int date;
   final String author;
+  final String series;
   final String isbn;
   final String description;
   final String cover;
@@ -370,6 +379,7 @@ class Book {
     this.title,
     this.date,
     this.author,
+    this.series,
     this.isbn,
     this.description,
     this.cover,
@@ -382,6 +392,7 @@ class Book {
       'title': title,
       'date': date,
       'author': author,
+      'series': series,
       'isbn': isbn,
       'description': description,
       'cover': cover,
@@ -393,7 +404,7 @@ class Book {
   // each book when using the print statement.
   @override
   String toString() {
-    return 'Book{id: $id, title: $title, date: ${DateTime.fromMillisecondsSinceEpoch(date)}, author: $author, isbn: $isbn, description: $description}';
+    return 'Book{id: $id, title: $title, date: ${DateTime.fromMillisecondsSinceEpoch(date)}, author: $author, series: $series, isbn: $isbn, description: $description}';
   }
 
   Widget toDetailWidget() {
