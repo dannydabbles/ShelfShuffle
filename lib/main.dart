@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         List<dynamic> authors = data['items'][0]['volumeInfo']['authors'];
         if (authors.length > 1) {
-          authors[-1] = "and " + authors[-1];
+          authors[authors.length-1] = "and " + authors[authors.length-1];
         }
         insertBook(Book(
           title: data['items'][0]['volumeInfo']['title'],
