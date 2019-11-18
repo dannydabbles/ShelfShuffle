@@ -138,7 +138,7 @@ Future<List<String>> getAuthors() async {
 
   // Query the table for all The Books.
   final List<Map<String, dynamic>> maps =
-      await db.rawQuery("SELECT DISTINCT author FROM books");
+      await db.rawQuery("SELECT DISTINCT author FROM books ORDER BY author");
   print(maps);
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
@@ -152,11 +152,9 @@ Future<List<Widget>> getBookWidgets(BuildContext context, String author) async {
   final Database db = await database;
 
   // Query the table for all The Books.
-  final List<Map<String, dynamic>> maps = await db.query('books',
-      where: "author = ?",
-      whereArgs: [author],
-      groupBy: "series",
-      orderBy: "date");
+  final List<Map<String, dynamic>> maps = await db.rawQuery(
+      "SELECT * from books where author = '$author' ORDER BY series DESC, date ASC;"
+  );
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
   return List.generate(maps.length, (i) {
