@@ -4,11 +4,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:intl/intl.dart';
 
 import 'package:shelf_shuffle/shelf.dart';
 import 'package:shelf_shuffle/expanding_fab.dart';
 import 'package:expandable/expandable.dart';
 import 'package:shelf_shuffle/view_book.dart';
+import 'package:sqflite/sqflite.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -36,7 +38,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => MyHomePage(title: title),
-        '/book': (context) => EditBookView(ModalRoute.of(context).settings.arguments),
+        '/book': (context) =>
+            EditBookView(ModalRoute.of(context).settings.arguments),
       },
     );
   }
@@ -79,6 +82,165 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {});
   }
 
+  Widget bookToDetailWidget(Book book) {
+    return Card(
+      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Container(
+          child: Row(
+            children: <Widget>[
+              Image(
+                image: NetworkImage("${book.cover}"),
+                alignment: Alignment.centerLeft,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(children: <Widget>[
+                    Text(
+                      "$title",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.3,
+                    ),
+                    Text(
+                      "by \n${book.author}",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: 1.15,
+                    ),
+                    Text(
+                      "Published ${DateFormat('yyyy').format(DateTime.fromMillisecondsSinceEpoch(book.date).toLocal())}",
+                      softWrap: true,
+                      textAlign: TextAlign.center,
+                      textScaleFactor: .8,
+                    ),
+                    Text(
+                      "${book.description}",
+                      softWrap: true,
+                      textAlign: TextAlign.left,
+                      maxLines: 7,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void areYouSureDialog(Book book) async {
+    Future<bool> _asyncBoolDialog(BuildContext context) async {
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false, // user must tap button for close dialog!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete book ${book.title}?'),
+            content: const Text(
+                'This will permanently delete this book from your library.'),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FlatButton(
+                child: const Text('DELETE'),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+
+    final bool sure = await _asyncBoolDialog(context);
+    if (sure) {
+      deleteBook(book.id);
+    }
+    setState(() {});
+  }
+
+  Widget bookToWidget(book) {
+    return Dismissible(
+        key: UniqueKey(),
+        background: slideToDeleteBackground(),
+        secondaryBackground: slideToEditBackground(),
+        onDismissed: (direction) {
+          print("Direction: $direction");
+          switch (direction) {
+            case DismissDirection.endToStart:
+              {
+                Navigator.pushNamed(context, '/book', arguments: book);
+              }
+              break;
+            case DismissDirection.startToEnd:
+              {
+                areYouSureDialog(book);
+              }
+              break;
+            default:
+              {
+                throw Exception("Invalid swipe action: $direction");
+              }
+              break;
+          }
+        },
+        child: Container(
+          height: 50,
+          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
+          child: Card(
+            color: Colors.white24,
+            margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 2.0),
+              child: Row(
+                children: <Widget>[
+                  Flexible(
+                    child: FractionallySizedBox(
+                      widthFactor: .2,
+                      child: Image(
+                        image: NetworkImage("${book.cover}"),
+                        alignment: Alignment.center,
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    child: FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: 1.8,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                        child: Text(
+                          "${book.title}",
+                          softWrap: true,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 23,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
   void fetchISBN(String isbn) async {
     var bookUrl = url + isbn;
     print(bookUrl);
@@ -98,7 +260,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         List<dynamic> authors = data['items'][0]['volumeInfo']['authors'];
         if (authors.length > 1) {
-          authors[authors.length-1] = "and " + authors[authors.length-1];
+          authors[authors.length - 1] = "and " + authors[authors.length - 1];
         }
         insertBook(Book(
           title: data['items'][0]['volumeInfo']['title'],
@@ -129,57 +291,122 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void getISBN() async {
+    Future<String> _asyncInputDialog(BuildContext context) async {
+      String isbn = '';
+      return showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        // dialog is dismissible with a tap on the barrier
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Enter a book by ISBN:'),
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                    child: new TextField(
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                      labelText: 'ISBN', hintText: 'eg. 0547951981'),
+                  onChanged: (value) {
+                    isbn = value;
+                  },
+                ))
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: Text('OK'),
+                onPressed: () {
+                  // Handle special case for empty isbn
+                  if (isbn.length > 0) {
+                    Navigator.of(context).pop(isbn);
+                  } else {
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     final String isbn = await _asyncInputDialog(context);
     fetchISBN(isbn);
   }
 
-  Future<String> _asyncInputDialog(BuildContext context) async {
-    String teamName = '';
-    return showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      // dialog is dismissible with a tap on the barrier
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter a book by ISBN:'),
-          content: new Row(
-            children: <Widget>[
-              new Expanded(
-                  child: new TextField(
-                autofocus: true,
-                decoration: new InputDecoration(
-                    labelText: 'ISBN', hintText: 'eg. 0547951981'),
-                onChanged: (value) {
-                  teamName = value;
-                },
-              ))
-            ],
+  Widget authorWidget(String author) {
+    return Dismissible(
+        key: UniqueKey(),
+        background: slideToDeleteBackground(),
+        secondaryBackground: slideToEditBackground(),
+        onDismissed: (direction) =>
+        {print("Author: $author | Direction: $direction")},
+        child: Card(
+          color: Colors.white38,
+          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
+                    child: Column(children: <Widget>[
+                      Text(
+                        "$author",
+                        softWrap: true,
+                        textScaleFactor: 1,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            height: 1),
+                      ),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
           ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('OK'),
-              onPressed: () {
-                // Handle special case for empty isbn
-                if (teamName.length > 0) {
-                  Navigator.of(context).pop(teamName);
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
+        ));
   }
 
-  Stream<List<Widget>> loadData(BuildContext context) async* {
+  Future<List<Widget>> getBookWidgets(String author) async {
+    // Get a reference to the database.
+    final Database db = await database;
+
+    // Query the table for all The Books.
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+        "SELECT * from books where author = '$author' ORDER BY series DESC, date ASC;");
+
+    // Convert the List<Map<String, dynamic> into a List<Book>.
+    return List.generate(maps.length, (i) {
+      Book book = Book(
+        id: maps[i]['id'],
+        title: maps[i]['title'],
+        date: maps[i]['date'],
+        author: maps[i]['author'],
+        series: maps[i]['series'],
+        isbn: maps[i]['isbn'],
+        description: maps[i]['description'],
+        cover: maps[i]['cover'],
+        google_api_json: maps[i]['google_api_json'],
+      );
+      return bookToWidget(book);
+    });
+  }
+
+  Stream<List<Widget>> loadData() async* {
     List<Widget> slivers = [];
     for (String author in await getAuthors()) {
       slivers += [
@@ -187,7 +414,7 @@ class _MyHomePageState extends State<MyHomePage> {
             hasIcon: false,
             tapHeaderToExpand: true,
             header: authorWidget(author),
-            collapsed: Column(children: await getBookWidgets(context, author)))
+            collapsed: Column(children: await getBookWidgets(author)))
       ];
     }
     yield slivers;
@@ -208,7 +435,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       backgroundColor: Colors.black12,
       body: StreamBuilder<List<Widget>>(
-        stream: loadData(context),
+        stream: loadData(),
         builder: (context, snapshot) {
           return snapshot.hasData
               ? CustomScrollView(

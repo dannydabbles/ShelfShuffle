@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:intl/intl.dart';
 
 final database = initShelf();
 
@@ -144,32 +143,6 @@ Future<List<String>> getAuthors() async {
   // Convert the List<Map<String, dynamic> into a List<Book>.
   return List.generate(maps.length, (i) {
     return maps[i]['author'];
-  });
-}
-
-Future<List<Widget>> getBookWidgets(BuildContext context, String author) async {
-  // Get a reference to the database.
-  final Database db = await database;
-
-  // Query the table for all The Books.
-  final List<Map<String, dynamic>> maps = await db.rawQuery(
-      "SELECT * from books where author = '$author' ORDER BY series DESC, date ASC;"
-  );
-
-  // Convert the List<Map<String, dynamic> into a List<Book>.
-  return List.generate(maps.length, (i) {
-    Book book = Book(
-      id: maps[i]['id'],
-      title: maps[i]['title'],
-      date: maps[i]['date'],
-      author: maps[i]['author'],
-      series: maps[i]['series'],
-      isbn: maps[i]['isbn'],
-      description: maps[i]['description'],
-      cover: maps[i]['cover'],
-      google_api_json: maps[i]['google_api_json'],
-    );
-    return book.toWidget(context);
   });
 }
 
@@ -322,46 +295,6 @@ void loadShelf() async {
   await insertBook(example);
 }
 
-Widget authorWidget(String author) {
-  return Dismissible(
-      key: UniqueKey(),
-      background: slideToDeleteBackground(),
-      secondaryBackground: slideToEditBackground(),
-      onDismissed: (direction) =>
-          {print("Author: $author | Direction: $direction")},
-      child: Card(
-        color: Colors.white38,
-        margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(0.0, 4.0, 0.0, 4.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
-                  child: Column(children: <Widget>[
-                    Text(
-                      "$author",
-                      softWrap: true,
-                      textScaleFactor: 1,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                          height: 1),
-                    ),
-                  ]),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ));
-}
-
 class Book {
   final int id;
   final String title;
@@ -404,112 +337,5 @@ class Book {
   @override
   String toString() {
     return 'Book{id: $id, title: $title, date: ${DateTime.fromMillisecondsSinceEpoch(date)}, author: $author, series: $series, isbn: $isbn, description: $description}';
-  }
-
-  Widget toDetailWidget() {
-    return Card(
-      margin: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Container(
-          child: Row(
-            children: <Widget>[
-              Image(
-                image: NetworkImage("$cover"),
-                alignment: Alignment.centerLeft,
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(children: <Widget>[
-                    Text(
-                      "$title",
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      textScaleFactor: 1.3,
-                    ),
-                    Text(
-                      "by \n$author",
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      textScaleFactor: 1.15,
-                    ),
-                    Text(
-                      "Published ${DateFormat('yyyy').format(DateTime.fromMillisecondsSinceEpoch(date).toLocal())}",
-                      softWrap: true,
-                      textAlign: TextAlign.center,
-                      textScaleFactor: .8,
-                    ),
-                    Text(
-                      "$description",
-                      softWrap: true,
-                      textAlign: TextAlign.left,
-                      maxLines: 7,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ]),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget toWidget(BuildContext context) {
-    return Dismissible(
-        key: UniqueKey(),
-        background: slideToDeleteBackground(),
-        secondaryBackground: slideToEditBackground(),
-        onDismissed: (direction) {
-          print("Direction: $direction");
-          Navigator.pushNamed(context, '/book', arguments: this);
-        },
-        child: Container(
-          height: 50,
-          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
-          child: Card(
-            color: Colors.white24,
-            margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 2.0),
-              child: Row(
-                children: <Widget>[
-                  Flexible(
-                    child: FractionallySizedBox(
-                      widthFactor: .2,
-                      child: Image(
-                        image: NetworkImage("$cover"),
-                        alignment: Alignment.center,
-                      ),
-                    ),
-                  ),
-                  Flexible(
-                    child: FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: 1.8,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-                        child: Text(
-                          "$title",
-                          softWrap: true,
-                          textAlign: TextAlign.left,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 23,
-                            height: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ));
   }
 }

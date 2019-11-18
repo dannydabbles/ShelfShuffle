@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shelf_shuffle/shelf.dart';
 
 class EditBookView extends StatefulWidget {
-  static const routeName = '/book';
   final Book book;
 
   EditBookView(this.book);
