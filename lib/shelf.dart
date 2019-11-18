@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
-import 'package:shelf_shuffle/view_book.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 
@@ -20,7 +19,7 @@ Future<Database> initShelf() async {
       return db.execute(
         "CREATE TABLE books("
         "id INTEGER PRIMARY KEY, "
-        "title TEXT, "
+        "title TEXT UNIQUE, "
         "date INTEGER, "
         "author TEXT, "
         "series TEXT, "
@@ -330,7 +329,8 @@ Widget authorWidget(String author) {
       key: UniqueKey(),
       background: slideToDeleteBackground(),
       secondaryBackground: slideToEditBackground(),
-      onDismissed: (direction) => {print("Author: $author | Direction: $direction")},
+      onDismissed: (direction) =>
+          {print("Author: $author | Direction: $direction")},
       child: Card(
         color: Colors.white38,
         margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),
@@ -466,7 +466,7 @@ class Book {
         secondaryBackground: slideToEditBackground(),
         onDismissed: (direction) {
           print("Direction: $direction");
-          Navigator.pushNamed(context, '/book');
+          Navigator.pushNamed(context, '/book', arguments: this);
         },
         child: Container(
           height: 50,

@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => MyHomePage(title: title),
-        '/book': (context) => EditBookView(),
+        '/book': (context) => EditBookView(ModalRoute.of(context).settings.arguments),
       },
     );
   }
