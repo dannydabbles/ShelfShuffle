@@ -133,8 +133,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void areYouSureDialog(Book book) async {
-    Future<bool> _asyncBoolDialog(BuildContext context) async {
+  void areYouSureBookDialog(Book book) async {
+    Future<bool> _asyncBoolDialog() async {
       return showDialog<bool>(
         context: context,
         barrierDismissible: false, // user must tap button for close dialog!
@@ -162,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    final bool sure = await _asyncBoolDialog(context);
+    final bool sure = await _asyncBoolDialog();
     if (sure) {
       deleteBook(book.id);
     }
@@ -184,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
               break;
             case DismissDirection.startToEnd:
               {
-                areYouSureDialog(book);
+                areYouSureBookDialog(book);
               }
               break;
             default:
@@ -341,13 +341,52 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchISBN(isbn);
   }
 
+  void areYouSureAuthorDialog(String author) async {
+    Future<bool> _asyncBoolDialog() async {
+      return showDialog<bool>(
+        context: context,
+        barrierDismissible: false, // user must tap button for close dialog!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Delete all books by author ${author}?'),
+            content: const Text(
+                'This will permanently delete these books from your library.'),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FlatButton(
+                child: const Text('DELETE ALL'),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+
+    final bool sure = await _asyncBoolDialog();
+    if (sure) {
+      deleteBooksByAuthor(author);
+    }
+    setState(() {});
+  }
+
   Widget authorWidget(String author) {
     return Dismissible(
         key: UniqueKey(),
         background: slideToDeleteBackground(),
-        secondaryBackground: slideToEditBackground(),
-        onDismissed: (direction) =>
-        {print("Author: $author | Direction: $direction")},
+        secondaryBackground: slideToDeleteBackground(),
+        onDismissed: (direction) {
+          print("Direction: $direction");
+          areYouSureAuthorDialog(author);
+          setState(() {});
+        },
         child: Card(
           color: Colors.white38,
           margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 3.0),

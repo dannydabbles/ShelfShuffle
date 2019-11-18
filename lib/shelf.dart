@@ -175,6 +175,20 @@ Future<void> deleteBook(int id) async {
   );
 }
 
+Future<void> deleteBooksByAuthor(String author) async {
+  // Get a reference to the database.
+  final db = await database;
+
+  // Remove the Book from the database.
+  await db.delete(
+    'books',
+    // Use a `where` clause to delete a specific book.
+    where: "author = ?",
+    // Pass the Book's id as a whereArg to prevent SQL injection.
+    whereArgs: [author],
+  );
+}
+
 Future<void> clearShelf() async {
   // Get a reference to the database.
   final db = await database;
