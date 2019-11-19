@@ -50,7 +50,7 @@ class _EditBookViewState extends State<EditBookView> {
         description: _descriptionController.text,
         isbn: book.isbn,
         cover: book.cover,
-        google_api_json: book.google_api_json,
+        goodreadsAPIJSON: book.goodreadsAPIJSON,
       ));
     }
   }

@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:shelf_shuffle/keys.dart';
 
 import 'package:shelf_shuffle/shelf.dart';
 import 'package:shelf_shuffle/expanding_fab.dart';
 import 'package:expandable/expandable.dart';
 import 'package:shelf_shuffle/view_book.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:xml2json/xml2json.dart';
+import 'package:best_effort_parser/name.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -73,7 +76,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    loadShelf();
+    fetchISBN("0747538492");
+    fetchISBN("0747595836");
+    fetchISBN("1551929767");
+    fetchISBN("	978-1-338-09913-3");
+    fetchISBN("9788498387568");
     setState(() {});
   }
 
@@ -242,35 +249,59 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void fetchISBN(String isbn) async {
-    var bookUrl = url + isbn;
+    var bookUrl = url + isbn.replaceAll("-", "").trim();
     print(bookUrl);
-    await http.get(bookUrl).then((response) {
-      String json = response.body.toString();
-      Map<String, dynamic> data = jsonDecode(json);
-      print(data);
-      if (data.isNotEmpty && data['totalItems'] != 0) {
+    String goodreadsSecret =
+        await SecretLoader(secretPath: "secrets.json").load();
+    await http
+        .get("https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret")
+        .then((response) {
+      final Xml2Json myTransformer = Xml2Json();
+      myTransformer.parse(response.body.toString());
+      String jsonStr = myTransformer.toBadgerfish().toString();
+      Map<String, dynamic> data =
+          json.decode(jsonStr)['GoodreadsResponse']['book'];
+      if (data.isNotEmpty) {
         int date = 0;
+        String year = data['work']['original_publication_year']['\$'].toString();
+        String month = data['work']['original_publication_month']['\$'].toString();
+        String day = data['work']['original_publication_day']['\$'].toString();
         try {
-          date = DateTime.parse(data['items'][0]['volumeInfo']['publishedDate'])
-              .millisecondsSinceEpoch;
+          date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
         } catch (Exception) {
-          date = DateTime.parse(
-                  data['items'][0]['volumeInfo']['publishedDate'] + "-01-01")
-              .millisecondsSinceEpoch;
+          date = DateTime.parse("$year-01-01").millisecondsSinceEpoch;
         }
-        List<dynamic> authors = data['items'][0]['volumeInfo']['authors'];
+        var authors_obj = data['authors']['author'];
+        if (authors_obj is Map) {
+          authors_obj = [authors_obj];
+        }
+        List<dynamic> authors = authors_obj;
+        authors = authors.map((author) => author['name']['\$'].toString()).toList();
+        String authorsLastName = NameParser.basic().parse(authors[0]).family;
+        String author;
         if (authors.length > 1) {
           authors[authors.length - 1] = "and " + authors[authors.length - 1];
+          author = authors.join(", ");
+        } else if (authors.length == 1) {
+          author = authors[0];
         }
+        String title = data['title']['__cdata'].toString();
+        String cover = data['image_url']['\$'].toString();
+        String description = data['description']['__cdata'].toString();
+        String series = data['series_works']['series_work']['series']['title']['__cdata'];
+        series = series.replaceAll("\\n", "");
+        series = series.trim();
+        print("Series: $series");
         insertBook(Book(
-          title: data['items'][0]['volumeInfo']['title'],
+          title: title,
           date: date,
-          author: authors.join(", "),
-          cover: data['items'][0]['volumeInfo']['imageLinks']["thumbnail"],
-          isbn: data['items'][0]['volumeInfo']['industryIdentifiers'][0]
-              ['identifier'],
-          description: data['items'][0]['volumeInfo']['description'],
-          google_api_json: json,
+          author: author,
+          cover: cover,
+          isbn: isbn,
+          series: series,
+          description: description,
+          authorLastName: authorsLastName,
+          goodreadsAPIJSON: jsonStr,
         ));
       }
     });
@@ -439,7 +470,7 @@ class _MyHomePageState extends State<MyHomePage> {
         isbn: maps[i]['isbn'],
         description: maps[i]['description'],
         cover: maps[i]['cover'],
-        google_api_json: maps[i]['google_api_json'],
+        goodreadsAPIJSON: maps[i]['google_api_json'],
       );
       return bookToWidget(book);
     });
