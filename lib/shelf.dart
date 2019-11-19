@@ -139,7 +139,7 @@ Future<List<String>> getAuthors() async {
 
   // Query the table for all The Books.
   final List<Map<String, dynamic>> maps =
-      await db.rawQuery("SELECT DISTINCT author FROM books ORDER BY author");
+      await db.rawQuery("SELECT DISTINCT author FROM books ORDER BY authorLastName");
   print(maps);
 
   // Convert the List<Map<String, dynamic> into a List<Book>.
