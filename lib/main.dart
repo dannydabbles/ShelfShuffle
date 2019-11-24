@@ -245,7 +245,8 @@ class _MyHomePageState extends State<MyHomePage> {
         .get("https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret")
         .then((response) {
       final Xml2Json myTransformer = Xml2Json();
-      myTransformer.parse(response.body.toString());
+      final String xml = response.body.toString();
+      myTransformer.parse(xml);
       String jsonStr = myTransformer.toBadgerfish().toString();
       Map<String, dynamic> data =
           json.decode(jsonStr)['GoodreadsResponse']['book'];
@@ -296,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
           series: series,
           description: description,
           authorLastName: authorLastName,
-          goodreadsAPIJSON: jsonStr,
+          goodreadsAPIXML: xml,
         ));
       }
     });
@@ -466,7 +467,7 @@ class _MyHomePageState extends State<MyHomePage> {
         isbn: maps[i]['isbn'],
         description: maps[i]['description'],
         cover: maps[i]['cover'],
-        goodreadsAPIJSON: maps[i]['google_api_json'],
+        goodreadsAPIXML: maps[i]['google_api_xml'],
       );
       return bookToWidget(book);
     });

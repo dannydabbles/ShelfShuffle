@@ -26,7 +26,7 @@ Future<Database> initShelf() async {
         "isbn TEXT, "
         "description TEXT, "
         "cover TEXT, "
-        "goodreadsAPIJSON TEXT"
+        "goodreadsAPIXML TEXT"
         ")",
       );
     },
@@ -128,7 +128,7 @@ Future<List<Book>> getBooks() async {
       isbn: maps[i]['isbn'],
       description: maps[i]['description'],
       cover: maps[i]['cover'],
-      goodreadsAPIJSON: maps[i]['goodreadsAPIJSON'],
+      goodreadsAPIXML: maps[i]['goodreadsAPIXML'],
     );
   });
 }
@@ -211,7 +211,7 @@ class Book {
   final String isbn;
   final String description;
   final String cover;
-  final String goodreadsAPIJSON;
+  final String goodreadsAPIXML;
 
   Book({
     this.id,
@@ -223,7 +223,7 @@ class Book {
     this.isbn,
     this.description,
     this.cover,
-    this.goodreadsAPIJSON,
+    this.goodreadsAPIXML,
   });
 
   Map<String, dynamic> toMap() {
@@ -237,7 +237,7 @@ class Book {
       'isbn': isbn,
       'description': description,
       'cover': cover,
-      'goodreadsAPIJSON': goodreadsAPIJSON,
+      'goodreadsAPIXML': goodreadsAPIXML,
     };
   }
 
