@@ -5,15 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
-import 'package:shelf_shuffle/keys.dart';
-
-import 'package:shelf_shuffle/shelf.dart';
-import 'package:shelf_shuffle/expanding_fab.dart';
 import 'package:expandable/expandable.dart';
-import 'package:shelf_shuffle/view_book.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:best_effort_parser/name.dart';
+import 'package:html/parser.dart';
+
+import 'package:shelf_shuffle/keys.dart';
+import 'package:shelf_shuffle/shelf.dart';
+import 'package:shelf_shuffle/expanding_fab.dart';
+import 'package:shelf_shuffle/view_book.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -236,6 +237,12 @@ class _MyHomePageState extends State<MyHomePage> {
         ));
   }
 
+  String stripHTML(String htmlString) {
+    var document = parse(htmlString);
+    String parsedString = parse(document.body.text).documentElement.text;
+    return parsedString;
+  }
+
   void fetchISBN(String isbn) async {
     var bookUrl = url + isbn.replaceAll("-", "").trim();
     print(bookUrl);
@@ -247,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final Xml2Json myTransformer = Xml2Json();
       final String xml = response.body.toString();
       myTransformer.parse(xml);
-      String jsonStr = myTransformer.toBadgerfish().toString();
+      String jsonStr = stripHTML(myTransformer.toBadgerfish().toString());
       Map<String, dynamic> data =
           json.decode(jsonStr)['GoodreadsResponse']['book'];
       if (data.isNotEmpty) {
