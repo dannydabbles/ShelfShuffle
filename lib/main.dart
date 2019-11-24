@@ -179,69 +179,57 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget bookToWidget(book) {
     return Dismissible(
         key: UniqueKey(),
-        background: slideToDeleteBackground(),
-        secondaryBackground: slideToEditBackground(),
+        background: slideToDeleteRightBackground(),
+        secondaryBackground: slideToDeleteLeftBackground(),
         onDismissed: (direction) {
-          print("Direction: $direction");
-          switch (direction) {
-            case DismissDirection.endToStart:
-              {
-                Navigator.pushNamed(context, '/book', arguments: book);
-              }
-              break;
-            case DismissDirection.startToEnd:
-              {
-                areYouSureBookDialog(book);
-              }
-              break;
-            default:
-              {
-                throw Exception("Invalid swipe action: $direction");
-              }
-              break;
-          }
+          areYouSureBookDialog(book);
         },
-        child: Container(
-          height: 50,
-          margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
-          child: Card(
-            color: Colors.white24,
-            margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 2.0),
-              child: Row(
-                children: <Widget>[
-                  Flexible(
-                    child: FractionallySizedBox(
-                      widthFactor: .2,
-                      child: Image(
-                        image: NetworkImage("${book.cover}"),
-                        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(context, '/book', arguments: book);
+          },
+          child: Container(
+            height: 50,
+            margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 2),
+            child: Card(
+              color: Colors.white24,
+              margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0.0, 2.0, 0.0, 2.0),
+                child: Row(
+                  children: <Widget>[
+                    Flexible(
+                      child: FractionallySizedBox(
+                        widthFactor: .2,
+                        child: Image(
+                          image: NetworkImage("${book.cover}"),
+                          alignment: Alignment.center,
+                        ),
                       ),
                     ),
-                  ),
-                  Flexible(
-                    child: FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: 1.8,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
-                        child: Text(
-                          "${book.title}",
-                          softWrap: true,
-                          textAlign: TextAlign.left,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 23,
-                            height: 1,
+                    Flexible(
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 1.8,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(2.0, 0.0, 2.0, 0.0),
+                          child: Text(
+                            "${book.title}",
+                            softWrap: true,
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 23,
+                              height: 1,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -263,8 +251,10 @@ class _MyHomePageState extends State<MyHomePage> {
           json.decode(jsonStr)['GoodreadsResponse']['book'];
       if (data.isNotEmpty) {
         int date = 0;
-        String year = data['work']['original_publication_year']['\$'].toString();
-        String month = data['work']['original_publication_month']['\$'].toString();
+        String year =
+            data['work']['original_publication_year']['\$'].toString();
+        String month =
+            data['work']['original_publication_month']['\$'].toString();
         String day = data['work']['original_publication_day']['\$'].toString();
         try {
           date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
@@ -276,7 +266,8 @@ class _MyHomePageState extends State<MyHomePage> {
           authors_obj = [authors_obj];
         }
         List<dynamic> authors = authors_obj;
-        authors = authors.map((author) => author['name']['\$'].toString()).toList();
+        authors =
+            authors.map((author) => author['name']['\$'].toString()).toList();
         String authorsLastName = NameParser.basic().parse(authors[0]).family;
         String author;
         if (authors.length > 1) {
@@ -288,7 +279,8 @@ class _MyHomePageState extends State<MyHomePage> {
         String title = data['title']['__cdata'].toString();
         String cover = data['image_url']['\$'].toString();
         String description = data['description']['__cdata'].toString();
-        String series = data['series_works']['series_work']['series']['title']['__cdata'];
+        String series =
+            data['series_works']['series_work']['series']['title']['__cdata'];
         series = series.replaceAll("\\n", "");
         series = series.trim();
         print("Series: $series");
@@ -411,8 +403,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget authorWidget(String author) {
     return Dismissible(
         key: UniqueKey(),
-        background: slideToDeleteBackground(),
-        secondaryBackground: slideToDeleteBackground(),
+        background: slideToDeleteRightBackground(),
+        secondaryBackground: slideToDeleteLeftBackground(),
         onDismissed: (direction) {
           print("Direction: $direction");
           areYouSureAuthorDialog(author);

@@ -37,7 +37,7 @@ Future<Database> initShelf() async {
   return database;
 }
 
-Widget slideToDeleteBackground() {
+Widget slideToDeleteRightBackground() {
   return Card(
     color: Colors.red,
     child: Align(
@@ -66,9 +66,9 @@ Widget slideToDeleteBackground() {
   );
 }
 
-Widget slideToEditBackground() {
+Widget slideToDeleteLeftBackground() {
   return Card(
-    color: Colors.green,
+    color: Colors.red,
     child: Align(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -76,17 +76,17 @@ Widget slideToEditBackground() {
           SizedBox(
             width: 20,
           ),
-          Icon(
-            Icons.edit,
-            color: Colors.white,
-          ),
           Text(
-            " Edit",
+            "Delete",
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.left,
+          ),
+          Icon(
+            Icons.delete,
+            color: Colors.white,
           ),
         ],
       ),
