@@ -268,8 +268,11 @@ class _MyHomePageState extends State<MyHomePage> {
         List<dynamic> authors = authors_obj;
         authors =
             authors.map((author) => author['name']['\$'].toString()).toList();
-        String authorsLastName = NameParser.basic().parse(authors[0]).family;
+        String authorLastName;
         String author;
+        if (authors.length > 0) {
+          authorLastName = NameParser.basic().parse(authors[0]).family;
+        }
         if (authors.length > 1) {
           authors[authors.length - 1] = "and " + authors[authors.length - 1];
           author = authors.join(", ");
@@ -292,7 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
           isbn: isbn,
           series: series,
           description: description,
-          authorLastName: authorsLastName,
+          authorLastName: authorLastName,
           goodreadsAPIJSON: jsonStr,
         ));
       }
@@ -458,6 +461,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: maps[i]['title'],
         date: maps[i]['date'],
         author: maps[i]['author'],
+        authorLastName: maps[i]['authorLastName'],
         series: maps[i]['series'],
         isbn: maps[i]['isbn'],
         description: maps[i]['description'],

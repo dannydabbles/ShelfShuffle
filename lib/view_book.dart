@@ -46,6 +46,7 @@ class _EditBookViewState extends State<EditBookView> {
         title: _titleController.text,
         date: milli,
         author: _authorController.text,
+        authorLastName: book.authorLastName,
         series: _seriesController.text,
         description: _descriptionController.text,
         isbn: book.isbn,
