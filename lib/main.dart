@@ -317,21 +317,29 @@ class _MyHomePageState extends State<MyHomePage> {
   void scanBarcode() async {
     if (this.scanning != null && this.scanning) return;
     this.scanning = true;
-    String isbn = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", // Red barcode line
-        "Cancel", // Cancel button text
-        true, // Show flash
-        ScanMode.DEFAULT // Scan a barcode
-    );
-    fetchISBN(isbn);
-    this.scanning = false;
+    try {
+      String isbn = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", // Red barcode line
+          "Cancel", // Cancel button text
+          true, // Show flash
+          ScanMode.DEFAULT // Scan a barcode
+      );
+      fetchISBN(isbn);
+    } finally {
+      this.scanning = false;
+    }
   }
 
   void scanCover() async {
     if (this.scanning != null && this.scanning) return;
     this.scanning = true;
-    dynamic coverScanResult = await Navigator.pushNamed(context, '/coverScanner');
-    print("Cover scan result: $coverScanResult");
+    try {
+      dynamic coverScanResult = await Navigator.pushNamed(
+          context, '/coverScanner');
+      print("Cover scan result: $coverScanResult");
+    } finally {
+      this.scanning = false;
+    }
   }
 
   void getISBN() async {
