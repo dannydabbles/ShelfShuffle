@@ -287,7 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else if (authors.length == 1) {
           author = authors[0];
         }
-        String title = data['title']['__cdata'].toString();
+        String title = data['title']['__cdata'].toString().replaceAll("\\", "");
         String cover = data['image_url']['\$'].toString();
         String description = data['description']['__cdata'].toString();
         String series =
