@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  camera:
+    dependency: transitive
+    description:
+      name: camera
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.6+3"
   charcode:
     dependency: transitive
     description:
@@ -71,6 +78,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  device_info:
+    dependency: transitive
+    description:
+      name: device_info
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.1+1"
   expandable:
     dependency: "direct main"
     description:
@@ -78,6 +92,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  firebase_ml_vision:
+    dependency: transitive
+    description:
+      name: firebase_ml_vision
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.9.3+3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -90,11 +111,25 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.7"
+  flutter_camera_ml_vision:
+    dependency: "direct main"
+    description:
+      name: flutter_camera_ml_vision
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_widgets:
+    dependency: transitive
+    description:
+      name: flutter_widgets
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.7+1"
   googleapis:
     dependency: "direct main"
     description:
@@ -158,6 +193,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.6.4"
+  path_provider:
+    dependency: transitive
+    description:
+      name: path_provider
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.4.4"
   pedantic:
     dependency: transitive
     description:
@@ -172,6 +214,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
+  platform:
+    dependency: transitive
+    description:
+      name: platform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.1"
   quiver:
     dependency: transitive
     description:
@@ -270,4 +319,4 @@ packages:
     version: "4.0.0"
 sdks:
   dart: ">=2.5.0 <3.0.0"
-  flutter: ">=1.9.1 <2.0.0"
+  flutter: ">=1.9.1+hotfix.5 <2.0.0"

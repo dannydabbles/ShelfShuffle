@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 class ExpandingFab extends StatefulWidget {
   final Function() barcodeScanner;
   final Function() lookUpISBN;
+  final Function() lookUpCover;
 
-  ExpandingFab({this.barcodeScanner, this.lookUpISBN});
+  ExpandingFab({this.barcodeScanner, this.lookUpISBN, this.lookUpCover});
 
   @override
   _ExpandingFabState createState() => _ExpandingFabState(
         barcodeScanner: this.barcodeScanner,
         lookUpISBN: this.lookUpISBN,
+        lookUpCover: this.lookUpCover,
       );
 }
 
@@ -24,8 +26,9 @@ class _ExpandingFabState extends State<ExpandingFab>
   double _fabHeight = 56.0;
   final Function() barcodeScanner;
   final Function() lookUpISBN;
+  final Function() lookUpCover;
 
-  _ExpandingFabState({this.barcodeScanner, this.lookUpISBN});
+  _ExpandingFabState({this.barcodeScanner, this.lookUpISBN, this.lookUpCover});
 
   @override
   initState() {
@@ -76,6 +79,17 @@ class _ExpandingFabState extends State<ExpandingFab>
     isOpened = !isOpened;
   }
 
+  Widget addCover() {
+    return Container(
+      child: FloatingActionButton(
+        heroTag: 3,
+        onPressed: this.lookUpCover,
+        tooltip: 'Scan book cover',
+        child: Icon(Icons.camera),
+      ),
+    );
+  }
+
   Widget addBarcode() {
     return Container(
       child: FloatingActionButton(
@@ -120,6 +134,14 @@ class _ExpandingFabState extends State<ExpandingFab>
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
+        Transform(
+          transform: Matrix4.translationValues(
+            0.0,
+            _translateButton.value * 3.0,
+            0.0,
+          ),
+          child: addCover(),
+        ),
         Transform(
           transform: Matrix4.translationValues(
             0.0,

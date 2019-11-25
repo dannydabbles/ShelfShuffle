@@ -28,6 +28,7 @@ dependencies:
   xml2json: ^4.0.0
   best_effort_parser: 1.1.0
   html: ^0.14.0+3
+  flutter_camera_ml_vision: ^2.2.4
 
   flutter:
     sdk: flutter

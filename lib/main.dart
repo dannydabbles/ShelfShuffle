@@ -15,6 +15,7 @@ import 'package:shelf_shuffle/keys.dart';
 import 'package:shelf_shuffle/shelf.dart';
 import 'package:shelf_shuffle/expanding_fab.dart';
 import 'package:shelf_shuffle/view_book.dart';
+import 'package:shelf_shuffle/title_finder.dart';
 
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
@@ -44,6 +45,8 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(title: title),
         '/book': (context) =>
             EditBookView(ModalRoute.of(context).settings.arguments),
+        '/coverScanner': (context) =>
+            TitleFinderPage(title: title),
       },
     );
   }
@@ -319,9 +322,16 @@ class _MyHomePageState extends State<MyHomePage> {
         "Cancel", // Cancel button text
         true, // Show flash
         ScanMode.DEFAULT // Scan a barcode
-        );
+    );
     fetchISBN(isbn);
     this.scanning = false;
+  }
+
+  void scanCover() async {
+    if (this.scanning != null && this.scanning) return;
+    this.scanning = true;
+    dynamic coverScanResult = await Navigator.pushNamed(context, '/coverScanner');
+    print("Cover scan result: $coverScanResult");
   }
 
   void getISBN() async {
@@ -563,6 +573,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: ExpandingFab(
         barcodeScanner: scanBarcode,
         lookUpISBN: getISBN,
+        lookUpCover: scanCover,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

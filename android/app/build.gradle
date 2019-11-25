@@ -39,7 +39,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.dannydabbles.shelf_shuffle"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -64,4 +64,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.1.0'
+    implementation 'androidx.versionedparcelable:versionedparcelable:1.1.0'
+    implementation 'androidx.core:core:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.1.0'
+    implementation 'androidx.fragment:fragment:1.1.0'
+    implementation 'androidx.exifinterface:exifinterface:1.0.0'
+    api 'com.google.android.gms:play-services-vision:18.0.0'
+    api 'com.google.android.gms:play-services-vision-common:18.0.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
