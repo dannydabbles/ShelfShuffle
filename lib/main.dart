@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(title: title),
         '/book': (context) =>
             EditBookView(ModalRoute.of(context).settings.arguments),
-        '/coverScanner': (context) => TitleFinderPage(title: title),
+        '/coverScanner': (context) => ScanPage(),
       },
     );
   }
@@ -256,7 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final Xml2Json myTransformer = Xml2Json();
       final String xml = response.body.toString();
       myTransformer.parse(xml);
-      String jsonStr = stripHTML(myTransformer.toBadgerfish().toString());
+      String jsonStr = myTransformer.toBadgerfish().toString();
       Map<String, dynamic> data =
           json.decode(jsonStr)['GoodreadsResponse']['book'];
       if (data.isNotEmpty) {
@@ -293,7 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
         String cover = data['image_url']['\$'].toString();
         String description = data['description']['__cdata'].toString();
         String series =
-            data['series_works']['series_work']['series']['title']['__cdata'];
+            data['series_works']['series_work']['series']['title']['__cdata'].toString();
         series = series.replaceAll("\\n", "");
         series = series.trim();
         print("Series: $series");
