@@ -26,16 +26,15 @@ class _ScanPageState extends State<ScanPage> {
             child: SafeArea(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: CameraMlVision<List<Barcode>>(
-                  detector:
-                      FirebaseVision.instance.barcodeDetector().detectInImage,
-                  onResult: (List<Barcode> barcodes) {
+                child: CameraMlVision<VisionText>(
+                  detector: FirebaseVision.instance.textRecognizer().processImage,
+                  onResult: (VisionText words) {
                     if (!mounted || resultSent) {
                       return;
                     }
-                    if (barcodes.isNotEmpty) {
+                    if (words.blocks.isNotEmpty) {
                       resultSent = true;
-                      Navigator.of(context).pop<Barcode>(barcodes.first);
+                      Navigator.of(context).pop<VisionText>(words);
                     }
                   },
                 ),

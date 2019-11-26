@@ -335,8 +335,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       dynamic coverScanResult =
           await Navigator.pushNamed(context, '/coverScanner');
-      String isbn = coverScanResult.rawValue;
-      fetchISBN(isbn);
+      String text = coverScanResult.text;
+      print("MLKit Text: " + text);
     } finally {
       this.scanning = false;
     }
