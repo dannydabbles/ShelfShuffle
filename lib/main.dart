@@ -45,8 +45,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => MyHomePage(title: title),
         '/book': (context) =>
             EditBookView(ModalRoute.of(context).settings.arguments),
-        '/coverScanner': (context) =>
-            TitleFinderPage(title: title),
+        '/coverScanner': (context) => TitleFinderPage(title: title),
       },
     );
   }
@@ -247,13 +246,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void fetchISBN(String isbn) async {
-    var bookUrl = url + isbn.replaceAll("-", "").trim();
-    print(bookUrl);
     String goodreadsSecret =
         await SecretLoader(secretPath: "secrets.json").load();
+    String url = "https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret";
+    print(url);
     await http
-        .get("https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret")
-        .then((response) {
+        .get(url)
+          .then((response) {
       final Xml2Json myTransformer = Xml2Json();
       final String xml = response.body.toString();
       myTransformer.parse(xml);
@@ -323,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
           "Cancel", // Cancel button text
           true, // Show flash
           ScanMode.DEFAULT // Scan a barcode
-      );
+          );
       fetchISBN(isbn);
     } finally {
       this.scanning = false;
@@ -334,9 +333,10 @@ class _MyHomePageState extends State<MyHomePage> {
     if (this.scanning != null && this.scanning) return;
     this.scanning = true;
     try {
-      dynamic coverScanResult = await Navigator.pushNamed(
-          context, '/coverScanner');
-      print("Cover scan result: $coverScanResult");
+      dynamic coverScanResult =
+          await Navigator.pushNamed(context, '/coverScanner');
+      String isbn = coverScanResult.rawValue;
+      fetchISBN(isbn);
     } finally {
       this.scanning = false;
     }

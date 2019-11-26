@@ -38,9 +38,10 @@ class _TitleFinderPageState extends State<TitleFinderPage> {
                 return;
               }
 
-              setState(() {
-                data.add(barcode.displayValue);
-              });
+              data.add(barcode.displayValue);
+              Navigator.of(context).pop<Barcode>(barcode);
+
+              setState(() {});
             },
           ),
           Expanded(
