@@ -346,9 +346,11 @@ class _MyHomePageState extends State<MyHomePage> {
           if (month == null || month == "null") {
             month = "01";
           }
+          month = month.padLeft(2, "0");
           if (day == null || day == "null") {
             day = "01";
           }
+          day = day.padLeft(2, "0");
           if (int.parse(year) >= 0) {
             date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
           } else {
@@ -602,13 +604,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Stream<List<Widget>> loadData() async* {
     List<Widget> slivers = [];
-    for (String author in await getAuthors()) {
+    List<String> allAuthors = await getAuthors();
+    Map<String, List<String>> authorDict = {};
+    for (String author in allAuthors) {
+      List<String> authors = author.split(', ');
+      String authorLastName = NameParser.basic().parse(authors[0]).family;
+      String authorFirstName = NameParser.basic().parse(authors[0]).given;
+      String authorFormatted = "$authorLastName, $authorFirstName";
+      if (authorDict.containsKey(authorFormatted)) {
+        authorDict[authorFormatted] += [author];
+      } else {
+        authorDict[authorFormatted] = [author];
+      }
+    }
+    for (String authorFormatted in authorDict.keys) {
+      List<String> authors = authorDict[authorFormatted];
+      List<Widget> authorWidgets = [];
+      for (String author in authors) {
+        authorWidgets += await getBookWidgets(author);
+      }
       slivers += [
         ExpandablePanel(
             hasIcon: false,
             tapHeaderToExpand: true,
-            header: authorWidget(author),
-            collapsed: Column(children: await getBookWidgets(author)))
+            header: authorWidget(authorFormatted),
+            collapsed: Column(children: authorWidgets))
       ];
     }
     yield slivers;
