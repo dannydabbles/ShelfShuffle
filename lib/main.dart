@@ -20,6 +20,8 @@ import 'package:shelf_shuffle/title_finder.dart';
 const url = 'https://www.googleapis.com/books/v1/volumes?q=isbn:';
 const title = "Shelf Shuffle";
 
+Map<String, List<String>> screenData = {};
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -528,7 +530,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final bool sure = await _asyncBoolDialog();
     if (sure) {
-      deleteBooksByAuthor(author);
+      for(String author in screenData[author]) {
+        deleteBooksByAuthor(author);
+      }
+      screenData.remove(author);
     }
     setState(() {});
   }
@@ -602,15 +607,20 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  String formatAuthor(String author) {
+    List<String> authors = author.split(', ');
+    String authorLastName = NameParser.basic().parse(authors[0]).family;
+    String authorFirstName = NameParser.basic().parse(authors[0]).given;
+    return "$authorLastName, $authorFirstName";
+  }
+
   Stream<List<Widget>> loadData() async* {
     List<Widget> slivers = [];
+    screenData.clear();
     List<String> allAuthors = await getAuthors();
     Map<String, List<String>> authorDict = {};
     for (String author in allAuthors) {
-      List<String> authors = author.split(', ');
-      String authorLastName = NameParser.basic().parse(authors[0]).family;
-      String authorFirstName = NameParser.basic().parse(authors[0]).given;
-      String authorFormatted = "$authorLastName, $authorFirstName";
+      String authorFormatted = formatAuthor(author);
       if (authorDict.containsKey(authorFormatted)) {
         authorDict[authorFormatted] += [author];
       } else {
@@ -621,6 +631,11 @@ class _MyHomePageState extends State<MyHomePage> {
       List<String> authors = authorDict[authorFormatted];
       List<Widget> authorWidgets = [];
       for (String author in authors) {
+        if (screenData.containsKey(authorFormatted)){
+          screenData[authorFormatted] += [author];
+        } else {
+          screenData[authorFormatted] = [author];
+        }
         authorWidgets += await getBookWidgets(author);
       }
       slivers += [
