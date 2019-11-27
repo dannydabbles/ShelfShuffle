@@ -343,7 +343,19 @@ class _MyHomePageState extends State<MyHomePage> {
           date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
         } catch (Exception) {
           print(Exception);
-          date = DateTime.parse("$year-01-01").millisecondsSinceEpoch;
+          if (month == null || month == "null") {
+            month = "01";
+          }
+          if (day == null || day == "null") {
+            day = "01";
+          }
+          if (int.parse(year) >= 0) {
+            date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
+          } else {
+            year = int.parse(year).abs().toString().padLeft(4, '0');
+            date = DateTime.parse("-$year-$month-$day").millisecondsSinceEpoch;
+          }
+          print(Exception);
         }
         var authors_obj = data['authors']['author'];
         if (authors_obj is Map) {
