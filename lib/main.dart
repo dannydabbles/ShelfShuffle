@@ -245,14 +245,52 @@ class _MyHomePageState extends State<MyHomePage> {
     return parsedString;
   }
 
+  Future<String> titleToId(String title) async {
+    String id;
+
+    String goodreadsSecret =
+        await SecretLoader(secretPath: "secrets.json").load();
+    String url =
+        "https://www.goodreads.com/search/index.xml?key=$goodreadsSecret&q=${Uri.encodeFull(title)}";
+    print(url);
+    await http.get(url).then((response) {
+      final Xml2Json myTransformer = Xml2Json();
+      final String xml = response.body.toString();
+      myTransformer.parse(xml);
+      String jsonStr = myTransformer.toBadgerfish().toString();
+      id = json.decode(jsonStr)['GoodreadsResponse']['search']['results']
+          ['work'][0]['best_book']['id']['\$'].toString();
+    });
+    return id;
+  }
+
+  Future<String> idToISBN(String id) async {
+    String isbn;
+
+    String goodreadsSecret =
+        await SecretLoader(secretPath: "secrets.json").load();
+    String url =
+        "https://www.goodreads.com/book/show.xml?key=$goodreadsSecret&id=$id";
+    print(url);
+    await http.get(url).then((response) {
+      final Xml2Json myTransformer = Xml2Json();
+      final String xml = response.body.toString();
+      myTransformer.parse(xml);
+      String jsonStr = myTransformer.toBadgerfish().toString();
+      isbn =
+          json.decode(jsonStr)['GoodreadsResponse']['book']['isbn']['__cdata'];
+    });
+
+    return isbn;
+  }
+
   void fetchISBN(String isbn) async {
     String goodreadsSecret =
         await SecretLoader(secretPath: "secrets.json").load();
-    String url = "https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret";
+    String url =
+        "https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret";
     print(url);
-    await http
-        .get(url)
-          .then((response) {
+    await http.get(url).then((response) {
       final Xml2Json myTransformer = Xml2Json();
       final String xml = response.body.toString();
       myTransformer.parse(xml);
@@ -290,10 +328,19 @@ class _MyHomePageState extends State<MyHomePage> {
           author = authors[0];
         }
         String title = data['title']['__cdata'].toString().replaceAll("\\", "");
+        if (title == null || title == "null") {
+          title = data['title']['\$'].toString().replaceAll("\\", "");
+        }
         String cover = data['image_url']['\$'].toString();
-        String description = data['description']['__cdata'].toString();
-        String series =
-            data['series_works']['series_work']['series']['title']['__cdata'].toString();
+        String description = stripHTML(data['description']['__cdata'].toString()).replaceAll("\\", "");
+        String series = "";
+        try {
+          series = data['series_works']['series_work']['series']['title']
+          ['__cdata']
+              .toString();
+        } catch (Exception) {
+          print(Exception);
+        }
         series = series.replaceAll("\\n", "");
         series = series.trim();
         print("Series: $series");
@@ -335,8 +382,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       dynamic coverScanResult =
           await Navigator.pushNamed(context, '/coverScanner');
-      String text = coverScanResult.text;
-      print("MLKit Text: " + text);
+      String title = coverScanResult.text;
+      fetchISBN(await idToISBN(await titleToId(title)));
     } finally {
       this.scanning = false;
     }
