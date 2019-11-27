@@ -39,6 +39,7 @@ class _EditBookViewState extends State<EditBookView> {
       try {
         milli = DateTime.parse(_dateController.text).millisecondsSinceEpoch;
       } catch (Exception) {
+        print(Exception);
         milli = DateTime.parse(_dateController.text + "-01-01").millisecondsSinceEpoch;
       }
       updateBook(Book(

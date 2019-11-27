@@ -79,11 +79,36 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    fetchISBN("0747538492");
-    fetchISBN("0747595836");
-    fetchISBN("1551929767");
-    fetchISBN("	978-1-338-09913-3");
-    fetchISBN("9788498387568");
+    queryToID("0747538492").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
+    queryToID("0747538492").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
+    queryToID("0747595836").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
+    queryToID("1551929767").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
+    queryToID("	978-1-338-09913-3").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
+    queryToID("9788498387568").then((id) {
+      idToISBN(id).then((isbn) {
+        fetchISBN(isbn);
+      });
+    });
     setState(() {});
   }
 
@@ -245,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return parsedString;
   }
 
-  Future<String> titleToId(String title) async {
+  Future<String> queryToID(String title) async {
     String id;
 
     String goodreadsSecret =
@@ -258,8 +283,18 @@ class _MyHomePageState extends State<MyHomePage> {
       final String xml = response.body.toString();
       myTransformer.parse(xml);
       String jsonStr = myTransformer.toBadgerfish().toString();
-      id = json.decode(jsonStr)['GoodreadsResponse']['search']['results']
-          ['work'][0]['best_book']['id']['\$'].toString();
+      try {
+        id = json
+            .decode(jsonStr)['GoodreadsResponse']['search']['results']['work']
+                ['best_book']['id']['\$']
+            .toString();
+      } catch (Exception) {
+        print(Exception);
+        id = json
+            .decode(jsonStr)['GoodreadsResponse']['search']['results']['work']
+                [0]['best_book']['id']['\$']
+            .toString();
+      }
     });
     return id;
   }
@@ -307,6 +342,7 @@ class _MyHomePageState extends State<MyHomePage> {
         try {
           date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
         } catch (Exception) {
+          print(Exception);
           date = DateTime.parse("$year-01-01").millisecondsSinceEpoch;
         }
         var authors_obj = data['authors']['author'];
@@ -332,11 +368,13 @@ class _MyHomePageState extends State<MyHomePage> {
           title = data['title']['\$'].toString().replaceAll("\\", "");
         }
         String cover = data['image_url']['\$'].toString();
-        String description = stripHTML(data['description']['__cdata'].toString()).replaceAll("\\", "");
+        String description =
+            stripHTML(data['description']['__cdata'].toString())
+                .replaceAll("\\", "");
         String series = "";
         try {
           series = data['series_works']['series_work']['series']['title']
-          ['__cdata']
+                  ['__cdata']
               .toString();
         } catch (Exception) {
           print(Exception);
@@ -371,6 +409,8 @@ class _MyHomePageState extends State<MyHomePage> {
           ScanMode.DEFAULT // Scan a barcode
           );
       fetchISBN(isbn);
+    } catch (Exception) {
+      print(Exception);
     } finally {
       this.scanning = false;
     }
@@ -383,7 +423,9 @@ class _MyHomePageState extends State<MyHomePage> {
       dynamic coverScanResult =
           await Navigator.pushNamed(context, '/coverScanner');
       String title = coverScanResult.text;
-      fetchISBN(await idToISBN(await titleToId(title)));
+      fetchISBN(await idToISBN(await queryToID(title)));
+    } catch (Exception) {
+      print(Exception);
     } finally {
       this.scanning = false;
     }
@@ -391,23 +433,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getISBN() async {
     Future<String> _asyncInputDialog(BuildContext context) async {
-      String isbn = '';
+      String isbn_or_title = '';
       return showDialog<String>(
         context: context,
         barrierDismissible: false,
         // dialog is dismissible with a tap on the barrier
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Enter a book by ISBN:'),
+            title: Text('Enter a book by ISBN or title:'),
             content: new Row(
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
                   autofocus: true,
                   decoration: new InputDecoration(
-                      labelText: 'ISBN', hintText: 'eg. 0547951981'),
+                      labelText: 'ISBN or title',
+                      hintText: 'eg. 0547951981 or The Odyssey'),
                   onChanged: (value) {
-                    isbn = value;
+                    isbn_or_title = value;
                   },
                 ))
               ],
@@ -423,8 +466,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('OK'),
                 onPressed: () {
                   // Handle special case for empty isbn
-                  if (isbn.length > 0) {
-                    Navigator.of(context).pop(isbn);
+                  if (isbn_or_title.length > 0) {
+                    Navigator.of(context).pop(isbn_or_title);
                   } else {
                     Navigator.of(context).pop();
                   }
@@ -436,8 +479,8 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
 
-    final String isbn = await _asyncInputDialog(context);
-    fetchISBN(isbn);
+    final String isbn_or_title = await _asyncInputDialog(context);
+    fetchISBN(await idToISBN(await queryToID(isbn_or_title)));
   }
 
   void areYouSureAuthorDialog(String author) async {
