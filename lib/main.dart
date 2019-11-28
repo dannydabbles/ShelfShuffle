@@ -46,7 +46,10 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => MyHomePage(title: title),
         '/book': (context) =>
-            EditBookView(ModalRoute.of(context).settings.arguments),
+            EditBookView(ModalRoute
+                .of(context)
+                .settings
+                .arguments),
         '/coverScanner': (context) => ScanPage(),
       },
     );
@@ -148,7 +151,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       textScaleFactor: 1.15,
                     ),
                     Text(
-                      "Published ${DateFormat('yyyy').format(DateTime.fromMillisecondsSinceEpoch(book.date).toLocal())}",
+                      "Published ${DateFormat('yyyy').format(DateTime
+                          .fromMillisecondsSinceEpoch(book.date).toLocal())}",
                       softWrap: true,
                       textAlign: TextAlign.center,
                       textScaleFactor: .8,
@@ -276,9 +280,10 @@ class _MyHomePageState extends State<MyHomePage> {
     String id;
 
     String goodreadsSecret =
-        await SecretLoader(secretPath: "secrets.json").load();
+    await SecretLoader(secretPath: "secrets.json").load();
     String url =
-        "https://www.goodreads.com/search/index.xml?key=$goodreadsSecret&q=${Uri.encodeFull(title)}";
+        "https://www.goodreads.com/search/index.xml?key=$goodreadsSecret&q=${Uri
+        .encodeFull(title)}";
     print(url);
     await http.get(url).then((response) {
       final Xml2Json myTransformer = Xml2Json();
@@ -288,13 +293,13 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         id = json
             .decode(jsonStr)['GoodreadsResponse']['search']['results']['work']
-                ['best_book']['id']['\$']
+        ['best_book']['id']['\$']
             .toString();
       } catch (Exception) {
         print(Exception);
         id = json
             .decode(jsonStr)['GoodreadsResponse']['search']['results']['work']
-                [0]['best_book']['id']['\$']
+        [0]['best_book']['id']['\$']
             .toString();
       }
     });
@@ -305,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String isbn;
 
     String goodreadsSecret =
-        await SecretLoader(secretPath: "secrets.json").load();
+    await SecretLoader(secretPath: "secrets.json").load();
     String url =
         "https://www.goodreads.com/book/show.xml?key=$goodreadsSecret&id=$id";
     print(url);
@@ -315,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
       myTransformer.parse(xml);
       String jsonStr = myTransformer.toBadgerfish().toString();
       isbn =
-          json.decode(jsonStr)['GoodreadsResponse']['book']['isbn']['__cdata'];
+      json.decode(jsonStr)['GoodreadsResponse']['book']['isbn']['__cdata'];
     });
 
     return isbn;
@@ -323,7 +328,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void fetchISBN(String isbn) async {
     String goodreadsSecret =
-        await SecretLoader(secretPath: "secrets.json").load();
+    await SecretLoader(secretPath: "secrets.json").load();
     String url =
         "https://www.goodreads.com/book/isbn/$isbn?key=$goodreadsSecret";
     print(url);
@@ -333,16 +338,18 @@ class _MyHomePageState extends State<MyHomePage> {
       myTransformer.parse(xml);
       String jsonStr = myTransformer.toBadgerfish().toString();
       Map<String, dynamic> data =
-          json.decode(jsonStr)['GoodreadsResponse']['book'];
+      json.decode(jsonStr)['GoodreadsResponse']['book'];
       if (data.isNotEmpty) {
         int date = 0;
         String year =
-            data['work']['original_publication_year']['\$'].toString();
+        data['work']['original_publication_year']['\$'].toString();
         String month =
-            data['work']['original_publication_month']['\$'].toString();
+        data['work']['original_publication_month']['\$'].toString();
         String day = data['work']['original_publication_day']['\$'].toString();
         try {
-          date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
+          date = DateTime
+              .parse("$year-$month-$day")
+              .millisecondsSinceEpoch;
         } catch (Exception) {
           print(Exception);
           if (month == null || month == "null") {
@@ -354,10 +361,14 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           day = day.padLeft(2, "0");
           if (int.parse(year) >= 0) {
-            date = DateTime.parse("$year-$month-$day").millisecondsSinceEpoch;
+            date = DateTime
+                .parse("$year-$month-$day")
+                .millisecondsSinceEpoch;
           } else {
             year = int.parse(year).abs().toString().padLeft(4, '0');
-            date = DateTime.parse("-$year-$month-$day").millisecondsSinceEpoch;
+            date = DateTime
+                .parse("-$year-$month-$day")
+                .millisecondsSinceEpoch;
           }
           print(Exception);
         }
@@ -371,7 +382,10 @@ class _MyHomePageState extends State<MyHomePage> {
         String authorLastName;
         String author;
         if (authors.length > 0) {
-          authorLastName = NameParser.basic().parse(authors[0]).family;
+          authorLastName = NameParser
+              .basic()
+              .parse(authors[0])
+              .family;
         }
         if (authors.length > 1) {
           authors[authors.length - 1] = "and " + authors[authors.length - 1];
@@ -385,12 +399,12 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         String cover = data['image_url']['\$'].toString();
         String description =
-            stripHTML(data['description']['__cdata'].toString())
-                .replaceAll("\\", "");
+        stripHTML(data['description']['__cdata'].toString())
+            .replaceAll("\\", "");
         String series = "";
         try {
           series = data['series_works']['series_work']['series']['title']
-                  ['__cdata']
+          ['__cdata']
               .toString();
         } catch (Exception) {
           print(Exception);
@@ -423,7 +437,7 @@ class _MyHomePageState extends State<MyHomePage> {
           "Cancel", // Cancel button text
           true, // Show flash
           ScanMode.DEFAULT // Scan a barcode
-          );
+      );
       fetchISBN(isbn);
     } catch (Exception) {
       print(Exception);
@@ -437,7 +451,7 @@ class _MyHomePageState extends State<MyHomePage> {
     this.scanning = true;
     try {
       dynamic coverScanResult =
-          await Navigator.pushNamed(context, '/coverScanner');
+      await Navigator.pushNamed(context, '/coverScanner');
       String title = coverScanResult.text;
       fetchISBN(await idToISBN(await queryToID(title)));
     } catch (Exception) {
@@ -461,14 +475,14 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 new Expanded(
                     child: new TextField(
-                  autofocus: true,
-                  decoration: new InputDecoration(
-                      labelText: 'ISBN or title',
-                      hintText: 'eg. 0547951981 or The Odyssey'),
-                  onChanged: (value) {
-                    isbn_or_title = value;
-                  },
-                ))
+                      autofocus: true,
+                      decoration: new InputDecoration(
+                          labelText: 'ISBN or title',
+                          hintText: 'eg. 0547951981 or The Odyssey'),
+                      onChanged: (value) {
+                        isbn_or_title = value;
+                      },
+                    ))
               ],
             ),
             actions: <Widget>[
@@ -530,7 +544,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final bool sure = await _asyncBoolDialog();
     if (sure) {
-      for(String author in screenData[author]) {
+      for (String author in screenData[author]) {
         deleteBooksByAuthor(author);
       }
       screenData.remove(author);
@@ -609,9 +623,21 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String formatAuthor(String author) {
     List<String> authors = author.split(', ');
-    String authorLastName = NameParser.basic().parse(authors[0]).family;
-    String authorFirstName = NameParser.basic().parse(authors[0]).given;
-    return "$authorLastName, $authorFirstName";
+    String authorLastName = NameParser
+        .basic()
+        .parse(authors[0])
+        .family;
+    String authorFirstName = NameParser
+        .basic()
+        .parse(authors[0])
+        .given;
+    String name;
+    if ("$authorFirstName" == "") {
+      name = "$authorLastName";
+    } else {
+      name = "$authorLastName, $authorFirstName";
+    }
+    return name;
   }
 
   Stream<List<Widget>> loadData() async* {
@@ -631,7 +657,7 @@ class _MyHomePageState extends State<MyHomePage> {
       List<String> authors = authorDict[authorFormatted];
       List<Widget> authorWidgets = [];
       for (String author in authors) {
-        if (screenData.containsKey(authorFormatted)){
+        if (screenData.containsKey(authorFormatted)) {
           screenData[authorFormatted] += [author];
         } else {
           screenData[authorFormatted] = [author];
@@ -668,51 +694,51 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, snapshot) {
           return snapshot.hasData
               ? CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      leading: IconButton(
-                        icon: Icon(Icons.autorenew),
-                        onPressed: _clearBooks,
-                        color: Colors.white,
-                      ),
-                      expandedHeight: 220.0,
-                      floating: true,
-                      pinned: true,
-                      snap: true,
-                      elevation: 5,
-                      backgroundColor: Colors.grey,
-                      flexibleSpace: FlexibleSpaceBar(
-                          centerTitle: true,
-                          title: Text(widget.title,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30.0,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: <Shadow>[
-                                    Shadow(
-                                      offset: Offset(1.0, -0.5),
-                                      blurRadius: 3.0,
-                                      color: Color.fromARGB(255, 0, 0, 0),
-                                    ),
-                                  ])),
-                          background: Image.network(
-                            'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&h=650&w=940',
-                            fit: BoxFit.cover,
-                            color: Colors.grey,
-                            colorBlendMode: BlendMode.saturation,
-                          )),
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return snapshot.data[index];
-                      }, childCount: snapshot.data.length),
-                    ),
-                  ],
-                )
+            slivers: [
+              SliverAppBar(
+                leading: IconButton(
+                  icon: Icon(Icons.autorenew),
+                  onPressed: _clearBooks,
+                  color: Colors.white,
+                ),
+                expandedHeight: 220.0,
+                floating: true,
+                pinned: true,
+                snap: true,
+                elevation: 5,
+                backgroundColor: Colors.grey,
+                flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: Text(widget.title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold,
+                            shadows: <Shadow>[
+                              Shadow(
+                                offset: Offset(1.0, -0.5),
+                                blurRadius: 3.0,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ])),
+                    background: Image.network(
+                      'https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&h=650&w=940',
+                      fit: BoxFit.cover,
+                      color: Colors.grey,
+                      colorBlendMode: BlendMode.saturation,
+                    )),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return snapshot.data[index];
+                }, childCount: snapshot.data.length),
+              ),
+            ],
+          )
               : Center(
-                  child: CircularProgressIndicator(),
-                );
+            child: CircularProgressIndicator(),
+          );
         },
       ),
       floatingActionButton: ExpandingFab(
