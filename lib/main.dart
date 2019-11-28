@@ -697,7 +697,7 @@ class _MyHomePageState extends State<MyHomePage> {
             slivers: [
               SliverAppBar(
                 leading: IconButton(
-                  icon: Icon(Icons.autorenew),
+                  icon: Icon(Icons.delete_sweep),
                   onPressed: _clearBooks,
                   color: Colors.white,
                 ),
